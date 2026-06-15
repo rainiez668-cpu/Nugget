@@ -40,15 +40,15 @@ Shows deadline, fee, prize, eligibility, language, design categories, source evi
 
 ![Competition detail](artifacts/screenshots/10-competition-detail.png)
 
-### Competition production studio
+### Competition file center
 
-Shows the selected concept, generated hero visual, jury strategy, material system, approval workflow, and production progress.
+Shows the official rules source, downloadable extracted summary, supplemental upload entry, and the parse-all-files action.
 
 ![Production studio](artifacts/screenshots/11-production-studio.png)
 
-### A1 board composer
+### Eligibility gate
 
-Shows the generated visual language assembled into an editable competition-board layout.
+Shows an explicit student eligibility verdict sourced from the competition rules before generation is unlocked.
 
 ![Board composer](artifacts/screenshots/12-board-composer.png)
 

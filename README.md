@@ -13,7 +13,7 @@ Nugget is a global design competition radar and local-first AI studio for studen
 - Source confidence grades, including official websites and WeChat sources
 - Competition detail panel with prize, eligibility, deadline, and source evidence
 - One-click handoff from a discovered competition into Studio analysis
-- Competition production workspace with requirement matrix, concept review, generated visuals, drawing list, A1 board composer, compliance gate, and submission package preview
+- Gated competition workflow: official file ingestion, eligibility verdict, deliverable matrix, generation unlock, review, and package stages
 - Built-in realistic furniture competition brief
 - One-click `/demo` route with generated output
 - Structured mock AI analysis with three complete concept directions
@@ -43,7 +43,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Open the competition radar at [http://localhost:3000/discover](http://localhost:3000/discover).
 
-Open the complete competition-production demo at [http://localhost:3000/production?competition=pohang-museum-2026](http://localhost:3000/production?competition=pohang-museum-2026).
+Open the complete student workflow demo at [http://localhost:3000/production?competition=real-leather-student-2026](http://localhost:3000/production?competition=real-leather-student-2026).
 
 For the instant completed Studio demo, open [http://localhost:3000/demo](http://localhost:3000/demo).
 
@@ -56,7 +56,7 @@ For the instant completed Studio demo, open [http://localhost:3000/demo](http://
 5. Explore the requirements and three concept directions.
 6. Save the project or export it as Markdown or JSON.
 
-For the end-to-end production concept, click **开始制作参赛方案** in a competition detail. The Pohang Museum sample includes three AI-generated architectural visuals, an editable concept direction, drawing schedule, A1 board preview, human review gate, and submission-package state.
+For the end-to-end workflow, open an eligible competition and click **进入参赛工作流**. Nugget first saves and reads the official rules, makes an explicit eligibility verdict, and extracts the required deliverables. Concept, image, layout, and package stages remain locked until those checks are approved.
 
 ## Discovery Data
 

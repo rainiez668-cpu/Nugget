@@ -57,15 +57,15 @@ async function main() {
 
   await page.goto(`${baseUrl}/discover`, { waitUntil: "networkidle" });
   await page.screenshot({ path: path.join(output, "09-global-radar.png"), fullPage: true });
-  await page.getByTestId("view-pohang-museum-2026").click();
-  await page.getByRole("complementary").getByRole("heading", { name: "韩国浦项博物馆国际设计竞赛" }).waitFor();
+  await page.getByTestId("view-real-leather-student-2026").click();
+  await page.getByRole("complementary").getByRole("heading", { name: "Real Leather 2026国际学生设计竞赛" }).waitFor();
   await page.screenshot({ path: path.join(output, "10-competition-detail.png"), fullPage: false });
   await page.getByRole("button", { name: "关闭详情" }).click();
 
-  await page.goto(`${baseUrl}/production?competition=pohang-museum-2026`, { waitUntil: "networkidle" });
+  await page.goto(`${baseUrl}/production?competition=real-leather-student-2026`, { waitUntil: "networkidle" });
   await page.screenshot({ path: path.join(output, "11-production-studio.png"), fullPage: true });
-  await page.getByRole("button", { name: /展板排版/ }).click();
-  await page.getByRole("heading", { name: "A1竞赛展板预览" }).waitFor();
+  await page.getByRole("button", { name: "读取全部文件并分析" }).click();
+  await page.getByRole("heading", { name: "你到底能不能参加？" }).waitFor();
   await page.screenshot({ path: path.join(output, "12-board-composer.png"), fullPage: true });
 
   await page.goto(`${baseUrl}/studio`, { waitUntil: "networkidle" });

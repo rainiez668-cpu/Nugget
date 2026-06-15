@@ -47,10 +47,11 @@ The built-in sample is the fictional **RE:FORM 2026 — International Student Fu
 - [x] Free-entry filtering works.
 - [x] Competition details show prize, eligibility, deadline, and sources.
 - [x] A discovered competition opens and automatically analyzes in Studio.
-- [x] Production Studio loads a competition-specific concept and generated visual set.
-- [x] Human approval state works.
-- [x] A1 board composer renders without visible desktop layout breakage.
-- [x] Submission preview package can be generated.
+- [x] Student/open competitions receive default priority.
+- [x] Official rule sources and downloadable extracted summaries appear in the file center.
+- [x] A student-eligible competition can pass the eligibility gate.
+- [x] A professional architect competition blocks the student workflow.
+- [x] Deliverables are extracted and must be approved before generation stages unlock.
 - [x] Desktop screenshots render without obvious breakage.
 - [x] Mobile landing and result views render at 390 px width.
 
@@ -62,7 +63,7 @@ The production build completed successfully with static pages for Landing, Studi
 
 - OpenAI and Anthropic adapters require the user’s own valid API key and were not called during verification.
 - The global radar currently uses a designed demo index. Production whole-web daily discovery still requires persistent backend collectors and source integrations.
-- AI-generated architectural images are concept visuals, not dimensionally reliable construction documents.
+- Image generation and board production are intentionally represented as unlocked workflow stages; their implementation follows after the rule and eligibility pipeline is stable.
 - Automated competition-site submission remains intentionally locked until eligibility, technical feasibility, AI rules, and final authorship approval are confirmed.
 - Projects are browser-local and do not sync between devices.
 - Mock mode is strongest for the included architecture, furniture, and product-design style briefs.

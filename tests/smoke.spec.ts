@@ -34,20 +34,30 @@ test("discover radar filters competitions and sends a brief to Studio", async ({
   await page.getByRole("button", { name: "只看免费比赛" }).click();
   await expect(page.getByTestId("competition-grid").getByText("免费报名").first()).toBeVisible();
 
-  await page.getByTestId("view-pohang-museum-2026").click();
-  await expect(page.getByRole("complementary").getByRole("heading", { name: "韩国浦项博物馆国际设计竞赛" })).toBeVisible();
+  await page.getByTestId("view-real-leather-student-2026").click();
+  await expect(page.getByRole("complementary").getByRole("heading", { name: "Real Leather 2026国际学生设计竞赛" })).toBeVisible();
   await page.getByRole("button", { name: /分析完整 Brief/ }).click();
   await expect(page.getByTestId("analysis-results")).toBeVisible();
-  await expect(page.getByText(/International Design Competition for Pohang Museum/).first()).toBeVisible();
+  await expect(page.getByText(/Real Leather. Stay Different./).first()).toBeVisible();
 });
 
-test("production studio reviews a concept and builds a submission preview", async ({ page }) => {
+test("student workflow parses rules, confirms eligibility, and unlocks generation", async ({ page }) => {
+  await page.goto("/production?competition=real-leather-student-2026");
+  await expect(page.getByRole("heading", { name: "竞赛文件中心" })).toBeVisible();
+  await page.getByRole("button", { name: "读取全部文件并分析" }).click();
+  await expect(page.getByRole("heading", { name: "你到底能不能参加？" })).toBeVisible();
+  await expect(page.getByText("符合学生优先条件")).toBeVisible();
+  await page.getByRole("button", { name: "确认资格并继续" }).click();
+  await expect(page.getByRole("heading", { name: "必须提交什么？" })).toBeVisible();
+  await expect(page.getByText(/至少3张、最多5张/)).toBeVisible();
+  await page.getByRole("button", { name: "我已审阅提交成果" }).click();
+  await expect(page.getByRole("heading", { name: "方案生成" })).toBeVisible();
+  await expect(page.getByText("流程节点已解锁")).toBeVisible();
+});
+
+test("professional competition blocks a student from production", async ({ page }) => {
   await page.goto("/production?competition=pohang-museum-2026");
-  await expect(page.getByRole("heading", { name: "Tidal Archive · 潮汐档案" })).toBeVisible();
-  await page.getByRole("button", { name: "批准当前方案方向" }).click();
-  await page.getByRole("button", { name: /展板排版/ }).click();
-  await expect(page.getByRole("heading", { name: "A1竞赛展板预览" })).toBeVisible();
-  await page.getByRole("button", { name: "生成提交包" }).click();
-  await expect(page.getByRole("heading", { name: "提交包" })).toBeVisible();
-  await expect(page.getByText("预览包已生成，等待你的最终批准。")).toBeVisible();
+  await page.getByRole("button", { name: "读取全部文件并分析" }).click();
+  await expect(page.getByText("学生不可独立参加")).toBeVisible();
+  await expect(page.getByRole("button", { name: "确认资格并继续" })).toBeDisabled();
 });

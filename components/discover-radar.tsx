@@ -15,6 +15,7 @@ import {
   Globe2,
   GraduationCap,
   Languages,
+  Lock,
   Radio,
   Search,
   ShieldCheck,
@@ -32,6 +33,7 @@ import {
   competitionSources,
 } from "@/lib/competitions";
 import { setImportedBrief } from "@/lib/storage";
+import { getRuleSet, inferParticipation } from "@/lib/competition-rules";
 import type { CompetitionListing } from "@/lib/types";
 
 type FeeFilter = "all" | "free" | "paid";
@@ -59,6 +61,9 @@ function DetailPanel({
   onClose: () => void;
   onAnalyze: () => void;
 }) {
+  const rules = getRuleSet(item.id);
+  const participation = rules?.participation ?? inferParticipation(item.eligibility);
+  const eligible = participation === "student" || participation === "open";
   return (
     <div className="fixed inset-0 z-[70] flex justify-end bg-ink/35 backdrop-blur-sm" role="dialog" aria-modal="true">
       <button type="button" aria-label="关闭详情" onClick={onClose} className="absolute inset-0 cursor-default" />
@@ -109,6 +114,10 @@ function DetailPanel({
                 </span>
               ))}
             </div>
+            <div className={`mt-4 rounded-2xl p-4 ${eligible ? "bg-[#dce8d2] text-[#405b35]" : "bg-[#f9e0d7] text-[#7d3825]"}`}>
+              <p className="font-black">{rules?.verdict ?? (eligible ? "适合当前学生身份" : "需要进一步核验资格")}</p>
+              <p className="mt-1 text-xs leading-5 opacity-75">{rules?.verdictDetail ?? "进入制作前，Nugget会读取官方细则并再次确认。"} </p>
+            </div>
           </section>
 
           <section className="mt-5 rounded-3xl border border-ink/10 bg-paper p-5">
@@ -154,9 +163,15 @@ function DetailPanel({
               <button type="button" onClick={onAnalyze} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 py-3.5 text-sm font-black text-white">
                 分析完整 Brief <Sparkles className="h-4 w-4" />
               </button>
-              <a href={`/production?competition=${item.id}`} className="inline-flex items-center justify-center gap-2 rounded-full bg-gold px-5 py-3.5 text-sm font-black text-ink">
-                开始制作参赛方案 <WandSparkles className="h-4 w-4" />
-              </a>
+              {eligible ? (
+                <a href={`/production?competition=${item.id}`} className="inline-flex items-center justify-center gap-2 rounded-full bg-gold px-5 py-3.5 text-sm font-black text-ink">
+                  进入参赛工作流 <WandSparkles className="h-4 w-4" />
+                </a>
+              ) : (
+                <span className="inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-full bg-white/10 px-5 py-3.5 text-center text-sm font-black text-white/40">
+                  当前身份不可直接参赛 <Lock className="h-4 w-4" />
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -171,7 +186,7 @@ export function DiscoverRadar() {
   const [category, setCategory] = useState("全部类别");
   const [type, setType] = useState("全部类型");
   const [fee, setFee] = useState<FeeFilter>("all");
-  const [eligibility, setEligibility] = useState("全部资格");
+  const [eligibility, setEligibility] = useState("适合学生");
   const [sort, setSort] = useState<SortMode>("recommended");
   const [selected, setSelected] = useState<CompetitionListing | null>(null);
   const [showAllCategories, setShowAllCategories] = useState(false);
@@ -193,7 +208,9 @@ export function DiscoverRadar() {
         if (type !== "全部类型" && item.competitionType !== type) return false;
         if (fee === "free" && item.entryFee !== 0) return false;
         if (fee === "paid" && item.entryFee <= 0) return false;
-        if (eligibility === "学生可参加" && !item.eligibility.some((value) => /学生|在校|毕业/.test(value))) return false;
+        const participation = getRuleSet(item.id)?.participation ?? inferParticipation(item.eligibility);
+        if (eligibility === "适合学生" && participation !== "student" && participation !== "open") return false;
+        if (eligibility === "学生可参加" && participation !== "student") return false;
         if (eligibility === "全球开放" && !item.eligibility.some((value) => /全球/.test(value))) return false;
         if (eligibility === "专业资格" && !item.eligibility.some((value) => /注册|专业|执业/.test(value))) return false;
         return true;
@@ -201,7 +218,10 @@ export function DiscoverRadar() {
       .sort((a, b) => {
         if (sort === "deadline") return a.daysLeft - b.daysLeft;
         if (sort === "prize") return b.prizeValueUsd - a.prizeValueUsd;
-        return competitionScore(b) - competitionScore(a);
+        const aParticipation = getRuleSet(a.id)?.participation ?? inferParticipation(a.eligibility);
+        const bParticipation = getRuleSet(b.id)?.participation ?? inferParticipation(b.eligibility);
+        const profileBoost = (value: typeof aParticipation) => value === "student" ? 80 : value === "open" ? 45 : value === "professional" ? -100 : 0;
+        return competitionScore(b) + profileBoost(bParticipation) - competitionScore(a) - profileBoost(aParticipation);
       });
   }, [category, eligibility, fee, query, sort, type]);
 
@@ -291,6 +311,7 @@ export function DiscoverRadar() {
               </select>
               <select value={eligibility} onChange={(event) => setEligibility(event.target.value)} className="rounded-xl border border-ink/10 bg-cream px-3 py-2.5 text-xs font-bold outline-none">
                 <option>全部资格</option>
+                <option>适合学生</option>
                 <option>学生可参加</option>
                 <option>全球开放</option>
                 <option>专业资格</option>
@@ -315,6 +336,10 @@ export function DiscoverRadar() {
 
           <div data-testid="competition-grid" className="mt-5 grid gap-4 lg:grid-cols-2">
             {results.map((item, index) => (
+              (() => {
+                const participation = getRuleSet(item.id)?.participation ?? inferParticipation(item.eligibility);
+                const eligible = participation === "student" || participation === "open";
+                return (
               <article key={item.id} className={`group overflow-hidden rounded-[2rem] border bg-paper shadow-card transition hover:-translate-y-1 hover:shadow-soft ${item.featured && index === 0 ? "border-gold" : "border-ink/10"}`}>
                 <div className="p-5 sm:p-6">
                   <div className="flex flex-wrap items-center justify-between gap-3">
@@ -327,6 +352,9 @@ export function DiscoverRadar() {
                         <span className="rounded-full bg-[#eee9df] px-3 py-1.5 text-[10px] font-black">{item.feeCurrency} {item.entryFee}</span>
                       )}
                       <SourceBadge grade={item.sourceGrade} />
+                      <span className={`rounded-full px-3 py-1.5 text-[10px] font-black ${eligible ? "bg-[#dce8d2] text-[#405b35]" : "bg-[#f9e0d7] text-[#8a3f29]"}`}>
+                        {participation === "student" ? "学生可参加" : participation === "open" ? "不限身份" : participation === "professional" ? "需专业资格" : "资格受限"}
+                      </span>
                     </div>
                     <span className="text-xs font-black text-[#9a5f28]">剩余 {item.daysLeft} 天</span>
                   </div>
@@ -373,6 +401,8 @@ export function DiscoverRadar() {
                   </div>
                 </div>
               </article>
+                );
+              })()
             ))}
           </div>
 
@@ -380,7 +410,7 @@ export function DiscoverRadar() {
             <div className="mt-6 rounded-[2rem] border border-dashed border-ink/20 bg-paper p-12 text-center">
               <Search className="mx-auto h-8 w-8 text-ink/30" />
               <h3 className="display mt-4 text-3xl font-semibold">没有找到符合条件的比赛</h3>
-              <button type="button" onClick={() => { setQuery(""); setCategory("全部类别"); setType("全部类型"); setFee("all"); setEligibility("全部资格"); }} className="mt-4 text-sm font-black text-[#8b6208]">
+              <button type="button" onClick={() => { setQuery(""); setCategory("全部类别"); setType("全部类型"); setFee("all"); setEligibility("适合学生"); }} className="mt-4 text-sm font-black text-[#8b6208]">
                 清除全部筛选
               </button>
             </div>

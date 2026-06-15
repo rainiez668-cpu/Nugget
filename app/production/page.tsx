@@ -1,5 +1,5 @@
-import { ProductionWorkspace } from "@/components/production-workspace";
+import { CompetitionWorkflow } from "@/components/competition-workflow";
 
 export default function ProductionPage() {
-  return <ProductionWorkspace />;
+  return <CompetitionWorkflow />;
 }
