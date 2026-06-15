@@ -21,6 +21,7 @@ import {
   SlidersHorizontal,
   Sparkles,
   Users,
+  WandSparkles,
   X,
 } from "lucide-react";
 import {
@@ -149,9 +150,14 @@ function DetailPanel({
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-gold">下一步</p>
             <h3 className="display mt-2 text-3xl font-semibold">把比赛带进 Nugget Studio</h3>
             <p className="mt-2 text-sm leading-6 text-white/60">自动填入 Brief，继续拆解规则、机会、风险和三个概念方向。</p>
-            <button type="button" onClick={onAnalyze} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-5 py-3.5 text-sm font-black text-ink">
-              用 Nugget 分析这场比赛 <Sparkles className="h-4 w-4" />
-            </button>
+            <div className="mt-5 grid gap-2 sm:grid-cols-2">
+              <button type="button" onClick={onAnalyze} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 py-3.5 text-sm font-black text-white">
+                分析完整 Brief <Sparkles className="h-4 w-4" />
+              </button>
+              <a href={`/production?competition=${item.id}`} className="inline-flex items-center justify-center gap-2 rounded-full bg-gold px-5 py-3.5 text-sm font-black text-ink">
+                开始制作参赛方案 <WandSparkles className="h-4 w-4" />
+              </a>
+            </div>
           </div>
         </div>
       </aside>

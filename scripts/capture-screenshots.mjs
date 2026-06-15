@@ -62,6 +62,12 @@ async function main() {
   await page.screenshot({ path: path.join(output, "10-competition-detail.png"), fullPage: false });
   await page.getByRole("button", { name: "关闭详情" }).click();
 
+  await page.goto(`${baseUrl}/production?competition=pohang-museum-2026`, { waitUntil: "networkidle" });
+  await page.screenshot({ path: path.join(output, "11-production-studio.png"), fullPage: true });
+  await page.getByRole("button", { name: /展板排版/ }).click();
+  await page.getByRole("heading", { name: "A1竞赛展板预览" }).waitFor();
+  await page.screenshot({ path: path.join(output, "12-board-composer.png"), fullPage: true });
+
   await page.goto(`${baseUrl}/studio`, { waitUntil: "networkidle" });
   await page.screenshot({ path: path.join(output, "02-studio-empty.png"), fullPage: true });
   await page.getByTestId("sample-brief").click();
@@ -99,7 +105,7 @@ async function main() {
   await mobile.screenshot({ path: path.join(output, "08-mobile-studio-result.png"), fullPage: false });
 
   await browser.close();
-  console.log(`Saved 10 screenshots to ${output}`);
+  console.log(`Saved 12 screenshots to ${output}`);
 }
 
 main()

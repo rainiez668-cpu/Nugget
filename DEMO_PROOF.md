@@ -40,6 +40,18 @@ Shows deadline, fee, prize, eligibility, language, design categories, source evi
 
 ![Competition detail](artifacts/screenshots/10-competition-detail.png)
 
+### Competition production studio
+
+Shows the selected concept, generated hero visual, jury strategy, material system, approval workflow, and production progress.
+
+![Production studio](artifacts/screenshots/11-production-studio.png)
+
+### A1 board composer
+
+Shows the generated visual language assembled into an editable competition-board layout.
+
+![Board composer](artifacts/screenshots/12-board-composer.png)
+
 ### 1. Landing page
 
 Shows the Nugget brand, product promise, Dig → Hatch → Polish → Pack workflow, example output, and primary calls to action.

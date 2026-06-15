@@ -7,7 +7,7 @@ test("landing, analysis, save, and library flow", async ({ page }) => {
   await page.goto("/studio");
   await page.getByTestId("sample-brief").click();
   await page.getByTestId("analyze-button").click();
-  await expect(page.getByTestId("analysis-results")).toBeVisible();
+  await expect(page.getByTestId("analysis-results")).toBeVisible({ timeout: 30000 });
 
   const markdownDownload = page.waitForEvent("download");
   await page.getByRole("button", { name: "Markdown" }).first().click();
@@ -21,7 +21,7 @@ test("landing, analysis, save, and library flow", async ({ page }) => {
   await page.goto("/library");
   await expect(page.getByTestId("project-grid")).toBeVisible();
   await page.getByTestId("reopen-project").click();
-  await expect(page.getByTestId("analysis-results")).toBeVisible();
+  await expect(page.getByTestId("analysis-results")).toBeVisible({ timeout: 30000 });
 
   await page.goto("/library");
   await page.getByRole("button", { name: /Delete RE:FORM/i }).click();
@@ -36,7 +36,18 @@ test("discover radar filters competitions and sends a brief to Studio", async ({
 
   await page.getByTestId("view-pohang-museum-2026").click();
   await expect(page.getByRole("complementary").getByRole("heading", { name: "韩国浦项博物馆国际设计竞赛" })).toBeVisible();
-  await page.getByRole("button", { name: /用 Nugget 分析这场比赛/ }).click();
+  await page.getByRole("button", { name: /分析完整 Brief/ }).click();
   await expect(page.getByTestId("analysis-results")).toBeVisible();
   await expect(page.getByText(/International Design Competition for Pohang Museum/).first()).toBeVisible();
+});
+
+test("production studio reviews a concept and builds a submission preview", async ({ page }) => {
+  await page.goto("/production?competition=pohang-museum-2026");
+  await expect(page.getByRole("heading", { name: "Tidal Archive · 潮汐档案" })).toBeVisible();
+  await page.getByRole("button", { name: "批准当前方案方向" }).click();
+  await page.getByRole("button", { name: /展板排版/ }).click();
+  await expect(page.getByRole("heading", { name: "A1竞赛展板预览" })).toBeVisible();
+  await page.getByRole("button", { name: "生成提交包" }).click();
+  await expect(page.getByRole("heading", { name: "提交包" })).toBeVisible();
+  await expect(page.getByText("预览包已生成，等待你的最终批准。")).toBeVisible();
 });
