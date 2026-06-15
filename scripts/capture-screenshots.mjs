@@ -65,9 +65,9 @@ async function main() {
   await page.getByRole("heading", { name: "你到底能不能参加？" }).waitFor();
   await page.screenshot({ path: path.join(output, "12-board-composer.png"), fullPage: true });
   await page.getByRole("button", { name: "确认资格并继续" }).click();
-  await page.getByRole("button", { name: "确认成果矩阵" }).click();
+  await page.getByRole("button", { name: "确认成果矩阵与数量" }).click();
   await page.getByRole("button", { name: /批准 Second Life/ }).click();
-  await page.getByRole("button", { name: "生成3张竞赛视觉" }).click();
+  await page.getByRole("button", { name: "生成 3 张竞赛视觉" }).click();
   await page.getByText(/演示AI样板|OpenAI真实生成/).waitFor({ timeout: 120000 });
   await page.screenshot({ path: path.join(output, "13-generated-visuals.png"), fullPage: true });
   await page.getByRole("button", { name: "批准视觉并排版" }).click();

@@ -49,14 +49,18 @@ test("student workflow completes generation, review, and simulated submission", 
   await expect(page.getByText("符合学生优先条件")).toBeVisible();
   await page.getByRole("button", { name: "确认资格并继续" }).click();
   await expect(page.getByRole("heading", { name: "必须提交什么？" })).toBeVisible();
-  await expect(page.getByText(/至少3张、最多5张/)).toBeVisible();
-  await page.getByRole("button", { name: "确认成果矩阵" }).click();
+  await expect(page.getByRole("heading", { name: "官方允许 3–5 张" })).toBeVisible();
+  await page.getByRole("button", { name: "+" }).click();
+  await page.getByRole("button", { name: "确认成果矩阵与数量" }).click();
   await expect(page.getByRole("heading", { name: "选择一个方案方向" })).toBeVisible();
   await page.getByRole("button", { name: /批准 Second Life/ }).click();
-  await page.getByRole("button", { name: "生成3张竞赛视觉" }).click();
+  await page.getByRole("button", { name: "生成 4 张竞赛视觉" }).click();
   await expect(page.getByText(/演示AI样板|OpenAI真实生成/)).toBeVisible({ timeout: 120000 });
+  await expect(page.getByText("V04 · 爆炸与装配")).toBeVisible();
   await page.getByRole("button", { name: "批准视觉并排版" }).click();
-  await expect(page.getByRole("heading", { name: "自动排版与文字" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "选择版式方向" })).toBeVisible();
+  await page.getByRole("button", { name: /编辑冲击/ }).click();
+  await expect(page.getByText("满版视觉 + 巨型标题")).toBeVisible();
   await page.getByRole("button", { name: "批准排版与文字" }).click();
   await expect(page.getByRole("heading", { name: "最终审阅与提交" })).toBeVisible();
 

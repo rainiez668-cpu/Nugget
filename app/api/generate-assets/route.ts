@@ -22,7 +22,7 @@ const fashionSamples = [
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as GenerateRequest;
-    const prompts = body.prompts?.filter(Boolean).slice(0, 3) ?? [];
+    const prompts = body.prompts?.filter(Boolean).slice(0, 8) ?? [];
     const isFashion = body.categories?.some((category) =>
       /时尚|纺织|珠宝|家具|产品/.test(category),
     );
@@ -30,7 +30,10 @@ export async function POST(request: Request) {
     if (!process.env.OPENAI_API_KEY || prompts.length === 0) {
       return NextResponse.json({
         provider: "mock",
-        assets: isFashion ? fashionSamples : architectureSamples,
+        assets: prompts.map((_, index) => {
+          const samples = isFashion ? fashionSamples : architectureSamples;
+          return samples[index % samples.length];
+        }),
       });
     }
 

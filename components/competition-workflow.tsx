@@ -29,10 +29,14 @@ import {
 import { getCompetition } from "@/lib/competitions";
 import { getRuleSet, inferParticipation } from "@/lib/competition-rules";
 import {
+  buildBoardLayouts,
+  buildAssetPlan,
+  buildAssetPrompts,
   buildConcepts,
   effectiveDeliverables,
   packageMarkdown,
 } from "@/lib/production";
+import { CompetitionBoard } from "@/components/competition-board";
 import type { CompetitionListing } from "@/lib/types";
 
 const steps = [
@@ -53,6 +57,9 @@ export function CompetitionWorkflow() {
   const [completed, setCompleted] = useState<string[]>([]);
   const [busy, setBusy] = useState("");
   const [selectedConcept, setSelectedConcept] = useState(0);
+  const [selectedLayout, setSelectedLayout] = useState(0);
+  const [assetCount, setAssetCount] = useState(3);
+  const [assetCountConfirmed, setAssetCountConfirmed] = useState(false);
   const [assets, setAssets] = useState<string[]>([]);
   const [imageProvider, setImageProvider] = useState("");
   const [statement, setStatement] = useState("");
@@ -69,13 +76,33 @@ export function CompetitionWorkflow() {
     ? rules?.participation ?? inferParticipation(competition.eligibility)
     : "restricted";
   const eligible = participation === "student" || participation === "open";
-  const deliverables = competition ? effectiveDeliverables(competition, rules) : [];
+  const deliverables = useMemo(
+    () => competition ? effectiveDeliverables(competition, rules) : [],
+    [competition, rules],
+  );
+  const assetPlan = useMemo(
+    () => competition ? buildAssetPlan(competition, deliverables) : undefined,
+    [competition, deliverables],
+  );
   const concepts = useMemo(() => competition ? buildConcepts(competition) : [], [competition]);
   const concept = concepts[selectedConcept];
+  const layouts = useMemo(
+    () => competition ? buildBoardLayouts(competition, selectedConcept) : [],
+    [competition, selectedConcept],
+  );
+  const layout = layouts[selectedLayout] ?? layouts[0];
   const progress = Math.round((completed.length / steps.length) * 100);
 
-  if (!competition || !concept) return null;
+  useEffect(() => {
+    if (!assetPlan) return;
+    setAssetCount(assetPlan.recommended);
+    setAssetCountConfirmed(assetPlan.confidence !== "unknown");
+    setAssets([]);
+  }, [assetPlan]);
+
+  if (!competition || !concept || !layout || !assetPlan) return null;
   const currentCompetition = competition;
+  const currentAssetPlan = assetPlan;
 
   const indexFor = (id: string) => steps.findIndex((step) => step.id === id);
   const canOpen = (id: string) => {
@@ -107,7 +134,12 @@ export function CompetitionWorkflow() {
           competitionTitle: currentCompetition.title,
           conceptTitle: concept.title,
           categories: currentCompetition.categories,
-          prompts: concept.prompts,
+          prompts: buildAssetPrompts(
+            currentCompetition,
+            concept,
+            currentAssetPlan,
+            assetCount,
+          ),
         }),
       });
       const data = await response.json();
@@ -120,7 +152,13 @@ export function CompetitionWorkflow() {
   }
 
   function downloadPackage() {
-    const markdown = packageMarkdown(currentCompetition, concept, deliverables);
+    const markdown = packageMarkdown(
+      currentCompetition,
+      concept,
+      deliverables,
+      assets.length,
+      currentAssetPlan.roles,
+    );
     const blob = new Blob([markdown], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -214,15 +252,52 @@ export function CompetitionWorkflow() {
               <div className="overflow-hidden rounded-3xl border border-ink/10 bg-paper shadow-card">
                 {deliverables.map((item, index) => <div key={item} className={`flex gap-4 p-5 ${index ? "border-t border-ink/10" : ""}`}><span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gold text-xs font-black">{index + 1}</span><p className="text-sm font-bold leading-6">{item}</p></div>)}
               </div>
+              <div className="mt-5 grid gap-4 rounded-3xl border border-ink/10 bg-paper p-5 shadow-card md:grid-cols-[1fr_250px]">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[.16em] text-[#9a6900]">Visual asset plan</p>
+                  <h3 className="mt-2 text-xl font-black">
+                    {assetPlan.confidence === "exact"
+                      ? `官方要求 ${assetPlan.min} 张`
+                      : assetPlan.confidence === "range"
+                        ? `官方允许 ${assetPlan.min}–${assetPlan.max} 张`
+                        : "图片数量需要人工确认"}
+                  </h3>
+                  <p className="mt-3 text-xs leading-6 text-ink/55">解析依据：{assetPlan.evidence}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {assetPlan.roles.slice(0, assetCount).map((role, index) => (
+                      <span key={role} className="rounded-full bg-cream px-3 py-1.5 text-[10px] font-black">
+                        V0{index + 1} · {role}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="rounded-2xl bg-cream p-4">
+                  <label className="text-xs font-black" htmlFor="asset-count">计划生成数量</label>
+                  <div className="mt-3 flex items-center gap-3">
+                    <button type="button" disabled={assetCount <= assetPlan.min} onClick={() => { setAssetCount((value) => value - 1); setAssets([]); }} className="h-10 w-10 rounded-full border border-ink/10 bg-paper font-black disabled:opacity-25">−</button>
+                    <input id="asset-count" readOnly value={assetCount} className="h-10 min-w-0 flex-1 rounded-xl border border-ink/10 bg-paper text-center text-lg font-black" />
+                    <button type="button" disabled={assetCount >= assetPlan.max} onClick={() => { setAssetCount((value) => value + 1); setAssets([]); }} className="h-10 w-10 rounded-full border border-ink/10 bg-paper font-black disabled:opacity-25">+</button>
+                  </div>
+                  <p className="mt-2 text-[10px] leading-4 text-ink/45">
+                    {assetPlan.confidence === "range" ? "默认采用最低合规数量以控制生成成本。" : "数量来自当前成果矩阵。"}
+                  </p>
+                  {assetPlan.confidence === "unknown" && (
+                    <label className="mt-3 flex gap-2 text-[10px] font-bold leading-4">
+                      <input type="checkbox" checked={assetCountConfirmed} onChange={(event) => setAssetCountConfirmed(event.target.checked)} className="accent-[#201d17]" />
+                      我已对照官方细则确认这个数量
+                    </label>
+                  )}
+                </div>
+              </div>
               <div className="mt-5 rounded-3xl bg-ink p-6 text-white"><p className="text-xs font-black uppercase tracking-[.15em] text-gold">AI与原创规则</p><p className="mt-3 text-sm leading-7 text-white/65">{rules?.aiRule ?? "未提取到明确AI限制；最终提交前必须再次核对官方规则。"}</p></div>
-              <div className="mt-5 flex justify-end"><button onClick={() => complete("deliverables", "concept")} className="rounded-full bg-gold px-6 py-3.5 text-sm font-black">确认成果矩阵</button></div>
+              <div className="mt-5 flex justify-end"><button disabled={!assetCountConfirmed} onClick={() => complete("deliverables", "concept")} className="rounded-full bg-gold px-6 py-3.5 text-sm font-black disabled:opacity-30">确认成果矩阵与数量</button></div>
             </Section>
           )}
 
           {active === "concept" && (
             <Section eyebrow="04 · CONCEPT GENERATION" title="选择一个方案方向" description="Nugget生成三个可比较方向；你批准后才进入生图。">
               <div className="grid gap-4 lg:grid-cols-3">
-                {concepts.map((item, index) => <button key={item.title} onClick={() => setSelectedConcept(index)} className={`rounded-3xl border p-5 text-left shadow-card transition ${selectedConcept === index ? "border-gold bg-[#fff5d8] ring-2 ring-gold/30" : "border-ink/10 bg-paper hover:-translate-y-1"}`}><p className="text-[10px] font-black text-ink/35">DIRECTION 0{index + 1}</p><h3 className="display mt-3 text-3xl font-semibold">{item.title}</h3><p className="mt-2 text-sm font-bold text-[#8b6208]">{item.tagline}</p><p className="mt-4 text-xs leading-6 text-ink/55">{item.strategy}</p><div className="mt-5 flex flex-wrap gap-1.5">{item.palette.map((color) => <span key={color} className="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold">{color}</span>)}</div></button>)}
+                {concepts.map((item, index) => <button key={item.title} onClick={() => { setSelectedConcept(index); setSelectedLayout(0); }} className={`rounded-3xl border p-5 text-left shadow-card transition ${selectedConcept === index ? "border-gold bg-[#fff5d8] ring-2 ring-gold/30" : "border-ink/10 bg-paper hover:-translate-y-1"}`}><p className="text-[10px] font-black text-ink/35">DIRECTION 0{index + 1}</p><h3 className="display mt-3 text-3xl font-semibold">{item.title}</h3><p className="mt-2 text-sm font-bold text-[#8b6208]">{item.tagline}</p><p className="mt-4 text-xs leading-6 text-ink/55">{item.strategy}</p><div className="mt-5 flex flex-wrap gap-1.5">{item.palette.map((color) => <span key={color} className="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold">{color}</span>)}</div></button>)}
               </div>
               <div className="mt-5 flex justify-end"><button onClick={() => { setStatement(concept.statement); complete("concept", "assets"); }} className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-black text-white">批准 {concept.title}<ChevronRight className="h-4 w-4" /></button></div>
             </Section>
@@ -231,23 +306,50 @@ export function CompetitionWorkflow() {
           {active === "assets" && (
             <Section eyebrow="05 · IMAGE GENERATION" title="生成竞赛视觉" description="有OpenAI密钥时真实生成；没有密钥时使用内置AI样板完成体验。">
               {assets.length === 0 ? (
-                <div className="rounded-3xl border border-dashed border-ink/20 bg-paper p-12 text-center shadow-card"><span className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-gold-soft"><WandSparkles className="h-7 w-7" /></span><h3 className="display mt-5 text-3xl font-semibold">3个提示词已经准备好</h3><p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-ink/55">整体主视觉、变化/场景图、构造细节图将保持同一方案语言。</p><button onClick={() => void generateAssets()} disabled={busy === "assets"} className="mt-6 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-black text-white">{busy === "assets" ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}{busy === "assets" ? "正在生成..." : "生成3张竞赛视觉"}</button></div>
+                <div className="rounded-3xl border border-dashed border-ink/20 bg-paper p-12 text-center shadow-card"><span className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-gold-soft"><WandSparkles className="h-7 w-7" /></span><h3 className="display mt-5 text-3xl font-semibold">{assetCount}个成果提示词已经准备好</h3><p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-ink/55">每张图对应一个成果角色，并保持同一方案、材料、比例和视觉语言。</p><div className="mx-auto mt-4 flex max-w-2xl flex-wrap justify-center gap-2">{assetPlan.roles.slice(0, assetCount).map((role, index) => <span key={role} className="rounded-full bg-cream px-3 py-1.5 text-[10px] font-black">V0{index + 1} · {role}</span>)}</div><button onClick={() => void generateAssets()} disabled={busy === "assets"} className="mt-6 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-black text-white">{busy === "assets" ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}{busy === "assets" ? `正在生成 ${assetCount} 张...` : `生成 ${assetCount} 张竞赛视觉`}</button></div>
               ) : (
-                <><div className="mb-4 flex justify-between"><span className="rounded-full bg-[#dce8d2] px-3 py-1.5 text-xs font-black text-[#405b35]">{imageProvider === "openai" ? "OpenAI真实生成" : "演示AI样板"}</span><button onClick={() => setAssets([])} className="text-xs font-black text-[#8b6208]">重新生成</button></div><div className="grid gap-4 lg:grid-cols-3">{assets.map((src, index) => <div key={index} className="overflow-hidden rounded-3xl border border-ink/10 bg-paper shadow-card"><div className="relative aspect-[4/3]"><Image src={src} alt={`Generated competition visual ${index + 1}`} fill unoptimized={src.startsWith("data:")} className="object-cover" /></div><div className="p-4"><p className="font-black">V0{index + 1} · {index === 0 ? "核心主视觉" : index === 1 ? "变化与场景" : "材料与细节"}</p><p className="mt-1 text-xs text-ink/45">对应成果矩阵，可在下一轮替换</p></div></div>)}</div><div className="mt-5 flex justify-end"><button onClick={() => complete("assets", "layout")} className="rounded-full bg-gold px-6 py-3.5 text-sm font-black">批准视觉并排版</button></div></>
+                <><div className="mb-4 flex justify-between"><span className="rounded-full bg-[#dce8d2] px-3 py-1.5 text-xs font-black text-[#405b35]">{imageProvider === "openai" ? "OpenAI真实生成" : "演示AI样板"} · {assets.length}张</span><button onClick={() => setAssets([])} className="text-xs font-black text-[#8b6208]">重新生成</button></div><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{assets.map((src, index) => <div key={index} className="overflow-hidden rounded-3xl border border-ink/10 bg-paper shadow-card"><div className="relative aspect-[4/3]"><Image src={src} alt={`Generated competition visual ${index + 1}`} fill unoptimized={src.startsWith("data:")} className="object-cover" /></div><div className="p-4"><p className="font-black">V{String(index + 1).padStart(2, "0")} · {assetPlan.roles[index] ?? `补充视觉 ${index + 1}`}</p><p className="mt-1 text-xs text-ink/45">对应成果矩阵，可单独重做或替换</p></div></div>)}</div><div className="mt-5 flex justify-end"><button onClick={() => complete("assets", "layout")} className="rounded-full bg-gold px-6 py-3.5 text-sm font-black">批准视觉并排版</button></div></>
               )}
             </Section>
           )}
 
           {active === "layout" && (
-            <Section eyebrow="06 · LAYOUT & COPY" title="自动排版与文字" description="根据成果数量、字数和视觉层级生成可审阅的提交页面。">
+            <Section eyebrow="06 · LAYOUT & COPY" title="选择版式方向" description="系统根据比赛类别、概念驱动和成果结构推荐三个不同构图；你决定最终阅读顺序。">
+              <div className="mb-5 grid gap-3 md:grid-cols-3">
+                {layouts.map((item, index) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setSelectedLayout(index)}
+                    className={`rounded-2xl border p-4 text-left transition ${
+                      selectedLayout === index
+                        ? "border-ink bg-ink text-white shadow-card"
+                        : "border-ink/10 bg-paper hover:border-gold"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="font-black">{item.name}</p>
+                      <span className={`rounded-full px-2 py-1 text-[9px] font-black ${selectedLayout === index ? "bg-gold text-ink" : "bg-gold-soft"}`}>
+                        方案 0{index + 1}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-[10px] font-black uppercase tracking-[.12em] opacity-45">{item.signature}</p>
+                    <p className="mt-3 text-xs leading-5 opacity-65">{item.rationale}</p>
+                  </button>
+                ))}
+              </div>
               <div className="grid gap-5 xl:grid-cols-[1.2fr_.8fr]">
                 <div className="rounded-3xl bg-[#cec7b9] p-5 shadow-card">
-                  <div className="grid aspect-[1.414/1] grid-cols-12 grid-rows-8 gap-1 bg-[#eee9df] p-1">
-                    <div className="relative col-span-8 row-span-5 overflow-hidden bg-ink">{assets[0] && <Image src={assets[0]} alt="Layout hero" fill unoptimized={assets[0].startsWith("data:")} className="object-cover" />}</div>
-                    <div className="col-span-4 row-span-3 bg-ink p-5 text-white"><p className="text-[7px] font-black text-gold">{competition.title}</p><h3 className="display mt-3 text-2xl font-semibold">{concept.title}</h3><p className="mt-3 text-[7px] leading-relaxed text-white/55">{concept.tagline}</p></div>
-                    <div className="col-span-4 row-span-2 bg-gold p-4"><p className="text-[7px] font-black">CONCEPT</p><p className="mt-2 text-[7px] leading-relaxed">{concept.strategy}</p></div>
-                    {[1, 2].map((assetIndex) => <div key={assetIndex} className="relative col-span-4 row-span-3 overflow-hidden bg-white">{assets[assetIndex] && <Image src={assets[assetIndex]} alt={`Layout visual ${assetIndex}`} fill unoptimized={assets[assetIndex].startsWith("data:")} className="object-cover" />}</div>)}
-                    <div className="col-span-4 row-span-3 bg-paper p-4"><p className="text-[7px] font-black">DELIVERABLES</p>{deliverables.slice(0, 4).map((item, index) => <p key={item} className="mt-2 border-b border-ink/10 pb-1 text-[6px]">0{index + 1} {item}</p>)}</div>
+                  <CompetitionBoard
+                    assets={assets}
+                    competitionTitle={competition.title}
+                    concept={concept}
+                    deliverables={deliverables}
+                    layout={layout}
+                  />
+                  <div className="mt-3 flex items-center justify-between text-[10px] font-black uppercase tracking-[.12em] text-ink/45">
+                    <span>{layout.name}</span>
+                    <span>根据 {competition.categories.slice(0, 2).join(" / ")} 推荐</span>
                   </div>
                 </div>
                 <div className="rounded-3xl border border-ink/10 bg-paper p-5 shadow-card"><label className="text-xs font-black">设计说明</label><textarea value={statement} onChange={(event) => setStatement(event.target.value)} className="mt-3 min-h-64 w-full rounded-2xl border border-ink/10 bg-cream p-4 text-sm leading-7 outline-none focus:border-gold" /><p className="mt-2 text-right text-xs font-bold text-ink/35">{statement.length} 字符</p></div>
@@ -261,7 +363,7 @@ export function CompetitionWorkflow() {
               {!submitted ? (
                 <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
                   <div className="overflow-hidden rounded-3xl border border-ink/10 bg-paper shadow-card">
-                    {["资格符合当前身份", "官方细则已读取并保留来源", "成果矩阵全部覆盖", "方案方向已经人工批准", "三张视觉已经生成并批准", "排版与文字已经审阅", "原创过程与AI使用记录已保留"].map((item) => <label key={item} className="flex items-center gap-3 border-b border-ink/10 p-4 last:border-0"><CheckCircle2 className="h-5 w-5 text-[#628150]" /><span className="text-sm font-bold">{item}</span></label>)}
+                    {["资格符合当前身份", "官方细则已读取并保留来源", "成果矩阵全部覆盖", "方案方向已经人工批准", `${assets.length}张视觉已经生成并批准`, "排版与文字已经审阅", "原创过程与AI使用记录已保留"].map((item) => <label key={item} className="flex items-center gap-3 border-b border-ink/10 p-4 last:border-0"><CheckCircle2 className="h-5 w-5 text-[#628150]" /><span className="text-sm font-bold">{item}</span></label>)}
                   </div>
                   <div className="space-y-4">
                     <button onClick={downloadPackage} className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink/10 bg-paper px-5 py-3.5 text-sm font-black"><Download className="h-4 w-4" />下载提交包清单</button>
