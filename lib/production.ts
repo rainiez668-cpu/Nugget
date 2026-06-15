@@ -149,45 +149,55 @@ export function buildBoardLayouts(
 }
 
 export function buildConcepts(competition: CompetitionListing): ProductionConcept[] {
+  const text = `${competition.title} ${competition.translatedTitle} ${competition.brief} ${competition.categories.join(" ")}`.toLowerCase();
+  const primary = (competition.categories[0] ?? "").toLowerCase();
   const domain = competition.categories[0] ?? "设计";
-  return [
-    {
-      title: "Second Life",
-      tagline: `把${domain}从一次性成果变成可持续演化的系统。`,
-      strategy: `以“拆解、重组、延长寿命”为核心，将竞赛要求转译为清晰的使用场景和可验证的材料策略。`,
-      palette: ["深酒红", "自然棕", "亚麻白", "哑光黄铜"],
-      statement: `Second Life 不把可持续性当作附加说明，而是让它成为设计的使用方式。方案通过可拆卸部件、清晰连接和可维修构造，使作品能够适应不同场景并延长生命周期。视觉语言保持克制，让材料、结构与人的动作成为表达主体。每一项变化都对应竞赛成果矩阵中的可制造性、原创性和清晰沟通要求，避免只停留在概念图层面。`,
-      prompts: [
-        `Competition hero visualization for ${competition.title}, concept Second Life, premium editorial presentation, complete proposal clearly visible, refined material detail, plausible construction`,
-        `Transformation sequence for ${competition.title}, three configurations shown consistently, clear assembly logic, competition portfolio quality`,
-        `Macro construction detail for ${competition.title}, repairable joint, material palette and craftsmanship, photoreal editorial lighting`,
-      ],
-    },
-    {
-      title: "Open Framework",
-      tagline: "用最少的固定形式，容纳最多的使用变化。",
-      strategy: "建立一个稳定的基础框架，通过轻量模块回应不同用户、环境和时间条件。",
-      palette: ["炭黑", "沙岩灰", "雾蓝", "暖木色"],
-      statement: "Open Framework 将设计理解为一个允许参与者持续调整的基础设施。它不追求单一姿态，而通过明确的主结构和可替换模块，平衡识别度、适应性与实施难度。",
-      prompts: [
-        `Hero visualization for ${competition.title}, concept Open Framework, adaptable modular system, calm contemporary design, competition quality`,
-        `Exploded configuration study for ${competition.title}, modular components and user scenarios, realistic materials`,
-        `Context visualization for ${competition.title}, human use and environmental response, coherent design language`,
-      ],
-    },
-    {
-      title: "Quiet Signal",
-      tagline: "不依赖夸张造型，用精准细节建立记忆点。",
-      strategy: "以一个可辨识的连接、界面或空间动作作为核心，其余部分保持安静和高完成度。",
-      palette: ["墨绿", "骨白", "石墨", "低饱和金色"],
-      statement: "Quiet Signal 把设计资源集中在一个最关键的动作上。通过统一比例、克制色彩和细节精度，让评委先看到清晰主张，再发现完整逻辑。",
-      prompts: [
-        `Competition hero for ${competition.title}, concept Quiet Signal, restrained iconic gesture, sophisticated editorial visualization`,
-        `Detail study for ${competition.title}, precision craftsmanship and coherent material junction`,
-        `Full presentation context for ${competition.title}, elegant human-scale use, believable implementation`,
-      ],
-    },
-  ];
+  const profiles = /平面|品牌|包装|摄影|影像/.test(primary) || /poster|graphic|illustration|海报|插画|dignity/.test(text)
+    ? [
+        ["Human Measure", "用一个可被立即理解的人类尺度符号回应比赛主题。", "将抽象议题压缩为单一主视觉、清晰对比和可跨语言传播的视觉动作。", ["Signal red", "Warm white", "Charcoal", "Cobalt"]],
+        ["Shared Ground", "让不同身份在同一视觉结构中获得平等位置。", "通过重复、差异与留白建立包容性叙事，避免口号式表达。", ["Ultramarine", "Clay", "Paper", "Black"]],
+        ["Quiet Evidence", "用克制的事实感代替煽情，让主题自己产生重量。", "采用档案、标记与缺席空间构成视觉证据链。", ["Graphite", "Fog", "Safety orange", "White"]],
+      ]
+    : /建筑|景观|城市|室内|展陈|遗产/.test(primary) || /microhome|pavilion|museum|architecture|遗址/.test(text)
+      ? [
+          ["Living Threshold", "把边界变成可使用的空间，而不是一条分隔线。", "以场地、气候和人的移动生成清晰空间序列，并让平面与剖面共享同一组织逻辑。", ["Limestone", "Earth", "Shadow", "Oxide"]],
+          ["Climate Spine", "用一条环境基础设施组织采光、通风、结构和公共生活。", "以主脊串联功能和流线，通过可验证的被动策略塑造建筑形态。", ["Sand", "Patina green", "Sky", "Charcoal"]],
+          ["Open Ruin", "让新介入保持可逆，使既有场所继续讲述自己的时间。", "采用轻触地面的构造、可拆模块与连续公共路径回应场地记忆。", ["Stone", "Bronze", "Dust", "Deep blue"]],
+        ]
+      : /产品|工业|家具|时尚|纺织|珠宝|交通|照明/.test(primary) || /product|furniture|fashion|leather/.test(text)
+        ? [
+            ["Adaptive Object", "一个对象通过清晰连接适应多种使用状态。", "以可替换部件、真实材料和可制造连接实现变化，而不是依赖概念造型。", ["Oxblood", "Natural tan", "Canvas", "Brass"]],
+            ["Material Loop", "让材料寿命、维修和再使用成为产品体验的一部分。", "从材料属性和加工工艺出发，减少永久粘合并展示装配逻辑。", ["Chestnut", "Bone", "Graphite", "Steel"]],
+            ["Essential Gesture", "集中设计资源解决一个最关键的人机动作。", "用克制形态、人体尺度和精确细节建立识别度与可行性。", ["Deep green", "Cream", "Black", "Bronze"]],
+          ]
+        : [
+            ["Visible Change", "把复杂议题转化为可看见、可参与的改变。", "以明确的前后关系和用户路径组织跨媒体体验。", ["Cobalt", "Amber", "White", "Charcoal"]],
+            ["Common Protocol", "建立一个允许不同人参与和扩展的开放规则。", "通过模块、界面和反馈机制形成可持续运行的系统。", ["Teal", "Sand", "Ink", "Coral"]],
+            ["Local Signal", "从具体场景提取一个可以全球理解的信号。", "用真实人物、环境证据和克制叙事避免空泛概念。", ["Forest", "Sky", "Clay", "Paper"]],
+          ];
+
+  return profiles.map(([title, tagline, strategy, palette]) => ({
+    title: title as string,
+    tagline: `${tagline} 本方向针对“${competition.translatedTitle}”。`,
+    strategy: `${strategy} 核心类别为${competition.categories.slice(0, 3).join("、")}。`,
+    palette: palette as string[],
+    statement: `${title} 从“${competition.translatedTitle}”的公开简报出发，围绕${competition.categories.slice(0, 3).join("、")}建立一套可被评委快速理解的方案。设计不把主题停留在口号，而是将其转译为具体对象、空间、视觉或使用过程。方案以${strategy}为主要方法，同时对照报名资格、成果格式和截止时间组织生产。所有生成内容都必须在最终提交前由参赛者核对官方细则、技术可行性、原创性与AI披露要求。`,
+    prompts: [
+      `Primary competition visual for "${competition.title}". Direction: ${title}. Brief: ${competition.brief}. Discipline: ${domain}. Show the complete proposal clearly, specific to the stated subject, credible and competition-ready.`,
+      `Second required evidence image for the exact same proposal for "${competition.title}", direction ${title}. Show use, context, transformation or spatial sequence appropriate to ${competition.categories.join(", ")}. Maintain identical design identity.`,
+      `Third required evidence image for the exact same proposal for "${competition.title}", direction ${title}. Show construction, material, system, typography or implementation detail appropriate to the brief. Maintain identical proportions and identity.`,
+    ],
+  }));
+}
+
+export function extractStatementLimit(deliverables: string[]) {
+  const evidence = deliverables.find((item) => /字|词|word|character/i.test(item));
+  const match = evidence?.match(/(?:最多|不超过|maximum|max\.?)\s*(\d+)/i);
+  return {
+    limit: match ? Number(match[1]) : undefined,
+    unit: /word|词/i.test(evidence ?? "") ? "words" : "characters",
+    evidence,
+  };
 }
 
 export function effectiveDeliverables(

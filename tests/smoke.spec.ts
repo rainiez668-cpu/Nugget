@@ -42,6 +42,21 @@ test("discover radar filters competitions and sends a brief to Studio", async ({
 });
 
 test("student workflow completes generation, review, and simulated submission", async ({ page }) => {
+  await page.route("**/api/generate-assets", async (route) => {
+    const request = route.request().postDataJSON() as { prompts?: string[] };
+    const samples = [
+      "/generation-samples/fashion/hero.png",
+      "/generation-samples/fashion/variations.png",
+      "/generation-samples/fashion/detail.png",
+    ];
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        provider: "mock",
+        assets: (request.prompts ?? []).map((_, index) => samples[index % samples.length]),
+      }),
+    });
+  });
   await page.goto("/production?competition=real-leather-student-2026");
   await expect(page.getByRole("heading", { name: "竞赛文件中心" })).toBeVisible();
   await page.getByRole("button", { name: "读取全部文件并分析" }).click();
@@ -53,7 +68,7 @@ test("student workflow completes generation, review, and simulated submission", 
   await page.getByRole("button", { name: "+" }).click();
   await page.getByRole("button", { name: "确认成果矩阵与数量" }).click();
   await expect(page.getByRole("heading", { name: "选择一个方案方向" })).toBeVisible();
-  await page.getByRole("button", { name: /批准 Second Life/ }).click();
+  await page.getByRole("button", { name: /批准 Adaptive Object/ }).click();
   await page.getByRole("button", { name: "生成 4 张竞赛视觉" }).click();
   await expect(page.getByText(/演示AI样板|OpenAI真实生成/)).toBeVisible({ timeout: 120000 });
   await expect(page.getByText("V04 · 爆炸与装配")).toBeVisible();
@@ -72,6 +87,24 @@ test("student workflow completes generation, review, and simulated submission", 
   await page.getByRole("button", { name: "模拟提交到竞赛网站" }).click();
   await expect(page.getByRole("heading", { name: "模拟提交成功" })).toBeVisible();
   await expect(page.getByText(/^NUG-\d{4}-/)).toBeVisible();
+});
+
+test("different competition categories produce different concept systems", async ({ page }) => {
+  const cases = [
+    ["poster-for-tomorrow", "Human Measure"],
+    ["microhome-2026", "Living Threshold"],
+    ["real-leather-student-2026", "Adaptive Object"],
+  ] as const;
+
+  for (const [competition, concept] of cases) {
+    await page.goto(`/production?competition=${competition}`);
+    await page.getByRole("button", { name: "读取全部文件并分析" }).click();
+    await page.getByRole("button", { name: "确认资格并继续" }).click();
+    const confirmation = page.getByText("我已对照官方细则确认这个数量");
+    if (await confirmation.isVisible()) await page.getByRole("checkbox").check();
+    await page.getByRole("button", { name: "确认成果矩阵与数量" }).click();
+    await expect(page.getByRole("heading", { name: concept })).toBeVisible();
+  }
 });
 
 test("professional competition blocks a student from production", async ({ page }) => {

@@ -34,6 +34,7 @@ import {
   buildAssetPrompts,
   buildConcepts,
   effectiveDeliverables,
+  extractStatementLimit,
   packageMarkdown,
 } from "@/lib/production";
 import { CompetitionBoard } from "@/components/competition-board";
@@ -83,6 +84,10 @@ export function CompetitionWorkflow() {
   const assetPlan = useMemo(
     () => competition ? buildAssetPlan(competition, deliverables) : undefined,
     [competition, deliverables],
+  );
+  const statementLimit = useMemo(
+    () => extractStatementLimit(deliverables),
+    [deliverables],
   );
   const concepts = useMemo(() => competition ? buildConcepts(competition) : [], [competition]);
   const concept = concepts[selectedConcept];
@@ -352,7 +357,7 @@ export function CompetitionWorkflow() {
                     <span>根据 {competition.categories.slice(0, 2).join(" / ")} 推荐</span>
                   </div>
                 </div>
-                <div className="rounded-3xl border border-ink/10 bg-paper p-5 shadow-card"><label className="text-xs font-black">设计说明</label><textarea value={statement} onChange={(event) => setStatement(event.target.value)} className="mt-3 min-h-64 w-full rounded-2xl border border-ink/10 bg-cream p-4 text-sm leading-7 outline-none focus:border-gold" /><p className="mt-2 text-right text-xs font-bold text-ink/35">{statement.length} 字符</p></div>
+                <div className="rounded-3xl border border-ink/10 bg-paper p-5 shadow-card"><label className="text-xs font-black">设计说明</label><textarea value={statement} onChange={(event) => setStatement(event.target.value)} className="mt-3 min-h-64 w-full rounded-2xl border border-ink/10 bg-cream p-4 text-sm leading-7 outline-none focus:border-gold" /><p className="mt-2 text-right text-xs font-bold text-ink/35">{statementLimit.unit === "words" ? (statement.trim() ? statement.trim().split(/\s+/).length : 0) : statement.length}{statementLimit.limit ? ` / ${statementLimit.limit} ${statementLimit.unit}` : " · 官方未注明字数上限"}</p></div>
               </div>
               <div className="mt-5 flex justify-end"><button onClick={() => complete("layout", "review")} className="rounded-full bg-ink px-6 py-3.5 text-sm font-black text-white">批准排版与文字</button></div>
             </Section>
