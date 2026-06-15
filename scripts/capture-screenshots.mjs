@@ -51,22 +51,32 @@ async function main() {
     acceptDownloads: true,
   });
   const page = await context.newPage();
+  page.setDefaultTimeout(30000);
 
   await page.goto(baseUrl, { waitUntil: "networkidle" });
   await page.screenshot({ path: path.join(output, "01-landing.png"), fullPage: true });
 
   await page.goto(`${baseUrl}/discover`, { waitUntil: "networkidle" });
   await page.screenshot({ path: path.join(output, "09-global-radar.png"), fullPage: true });
-  await page.getByTestId("view-real-leather-student-2026").click();
-  await page.getByRole("complementary").getByRole("heading", { name: "Real Leather 2026国际学生设计竞赛" }).waitFor();
-  await page.screenshot({ path: path.join(output, "10-competition-detail.png"), fullPage: false });
-  await page.getByRole("button", { name: "关闭详情" }).click();
 
   await page.goto(`${baseUrl}/production?competition=real-leather-student-2026`, { waitUntil: "networkidle" });
   await page.screenshot({ path: path.join(output, "11-production-studio.png"), fullPage: true });
   await page.getByRole("button", { name: "读取全部文件并分析" }).click();
   await page.getByRole("heading", { name: "你到底能不能参加？" }).waitFor();
   await page.screenshot({ path: path.join(output, "12-board-composer.png"), fullPage: true });
+  await page.getByRole("button", { name: "确认资格并继续" }).click();
+  await page.getByRole("button", { name: "确认成果矩阵" }).click();
+  await page.getByRole("button", { name: /批准 Second Life/ }).click();
+  await page.getByRole("button", { name: "生成3张竞赛视觉" }).click();
+  await page.getByText(/演示AI样板|OpenAI真实生成/).waitFor({ timeout: 120000 });
+  await page.screenshot({ path: path.join(output, "13-generated-visuals.png"), fullPage: true });
+  await page.getByRole("button", { name: "批准视觉并排版" }).click();
+  await page.screenshot({ path: path.join(output, "14-auto-layout.png"), fullPage: true });
+  await page.getByRole("button", { name: "批准排版与文字" }).click();
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "模拟提交到竞赛网站" }).click();
+  await page.getByRole("heading", { name: "模拟提交成功" }).waitFor();
+  await page.screenshot({ path: path.join(output, "15-submission-receipt.png"), fullPage: true });
 
   await page.goto(`${baseUrl}/studio`, { waitUntil: "networkidle" });
   await page.screenshot({ path: path.join(output, "02-studio-empty.png"), fullPage: true });
@@ -105,7 +115,7 @@ async function main() {
   await mobile.screenshot({ path: path.join(output, "08-mobile-studio-result.png"), fullPage: false });
 
   await browser.close();
-  console.log(`Saved 12 screenshots to ${output}`);
+  console.log(`Saved 14 screenshots to ${output}`);
 }
 
 main()

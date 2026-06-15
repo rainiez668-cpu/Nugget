@@ -13,7 +13,10 @@ Nugget is a global design competition radar and local-first AI studio for studen
 - Source confidence grades, including official websites and WeChat sources
 - Competition detail panel with prize, eligibility, deadline, and source evidence
 - One-click handoff from a discovered competition into Studio analysis
-- Gated competition workflow: official file ingestion, eligibility verdict, deliverable matrix, generation unlock, review, and package stages
+- Seven-stage workflow: files, eligibility, deliverables, concept approval, image generation, layout, review, and submission receipt
+- Three competition visuals from built-in demo assets or live OpenAI image generation
+- Editable statement, automatic board composition, and downloadable submission manifest
+- Human-reviewed simulated submission with a direct official-page handoff
 - Built-in realistic furniture competition brief
 - One-click `/demo` route with generated output
 - Structured mock AI analysis with three complete concept directions
@@ -56,7 +59,7 @@ For the instant completed Studio demo, open [http://localhost:3000/demo](http://
 5. Explore the requirements and three concept directions.
 6. Save the project or export it as Markdown or JSON.
 
-For the end-to-end workflow, open an eligible competition and click **进入参赛工作流**. Nugget first saves and reads the official rules, makes an explicit eligibility verdict, and extracts the required deliverables. Concept, image, layout, and package stages remain locked until those checks are approved.
+For the end-to-end workflow, open an eligible competition and click **进入参赛工作流**. Nugget checks the rules and eligibility, extracts deliverables, creates concepts and visuals, composes a board, supports editing and approval, downloads a package manifest, and produces a simulated submission receipt.
 
 ## Discovery Data
 
@@ -73,6 +76,8 @@ ANTHROPIC_API_KEY=
 ```
 
 Supported values for `AI_PROVIDER` are `mock`, `openai`, and `anthropic`. Missing keys always fall back to mock mode. Keys are read only by the server route and are never exposed to the browser.
+
+Without `OPENAI_API_KEY`, the production workflow uses built-in design samples. With a valid key, it generates three new PNG visuals through the OpenAI Images API.
 
 ## Mock AI
 
@@ -104,7 +109,8 @@ Screenshots are written to `artifacts/screenshots/`.
 
 - Editable concept refinement
 - User-defined competition discovery sources
-- Image generation and board composition
+- Exportable PDF/JPG presentation boards
+- Site-specific authenticated submission adapters
 - Cloud sync and collaborative review
 - Provider model selection and structured schema validation
 - Submission calendar and deadline reminders

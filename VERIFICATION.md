@@ -1,6 +1,6 @@
 # Verification
 
-Verified on June 14, 2026 in Windows PowerShell with Node.js 22.14.0.
+Verified on June 15, 2026 in Windows PowerShell with Node.js 22.14.0.
 
 ## Commands Run
 
@@ -12,8 +12,8 @@ Verified on June 14, 2026 in Windows PowerShell with Node.js 22.14.0.
 | `npm run typecheck` | Passed |
 | `npm run build` | Passed |
 | `npx playwright install chromium` | Passed |
-| `npm run demo:screenshots` | Passed; 8 screenshots created |
-| `npx playwright test` | Passed; 3 end-to-end tests |
+| `npm run demo:screenshots` | Passed; 14 screenshots created |
+| `npm run test:e2e` | Passed; 4 end-to-end tests |
 
 ## Errors Fixed
 
@@ -52,19 +52,23 @@ The built-in sample is the fictional **RE:FORM 2026 — International Student Fu
 - [x] A student-eligible competition can pass the eligibility gate.
 - [x] A professional architect competition blocks the student workflow.
 - [x] Deliverables are extracted and must be approved before generation stages unlock.
+- [x] Three competition visuals generate in offline demo mode.
+- [x] Generated visuals compose into an editable presentation board.
+- [x] Submission package manifest downloads as Markdown.
+- [x] Human approval unlocks a simulated submission receipt.
 - [x] Desktop screenshots render without obvious breakage.
 - [x] Mobile landing and result views render at 390 px width.
 
 ## Build Result
 
-The production build completed successfully with static pages for Landing, Studio, Demo, Library, and About, plus the dynamic `/api/analyze` route.
+The production build completed successfully, including the dynamic `/api/analyze` and `/api/generate-assets` routes.
 
 ## Known Limitations
 
 - OpenAI and Anthropic adapters require the user’s own valid API key and were not called during verification.
 - The global radar currently uses a designed demo index. Production whole-web daily discovery still requires persistent backend collectors and source integrations.
-- Image generation and board production are intentionally represented as unlocked workflow stages; their implementation follows after the rule and eligibility pipeline is stable.
-- Automated competition-site submission remains intentionally locked until eligibility, technical feasibility, AI rules, and final authorship approval are confirmed.
+- Live OpenAI image generation requires a valid API key; verification used the built-in image set.
+- Competition-site submission is simulated because real sites require per-site accounts, CAPTCHA, declarations, and final user authorization.
 - Projects are browser-local and do not sync between devices.
 - Mock mode is strongest for the included architecture, furniture, and product-design style briefs.
-- No GIF was created; the eight required screenshots provide the visual proof set.
+- No GIF was created; the screenshot set provides visual proof.

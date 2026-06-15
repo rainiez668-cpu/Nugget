@@ -41,7 +41,7 @@ test("discover radar filters competitions and sends a brief to Studio", async ({
   await expect(page.getByText(/Real Leather. Stay Different./).first()).toBeVisible();
 });
 
-test("student workflow parses rules, confirms eligibility, and unlocks generation", async ({ page }) => {
+test("student workflow completes generation, review, and simulated submission", async ({ page }) => {
   await page.goto("/production?competition=real-leather-student-2026");
   await expect(page.getByRole("heading", { name: "竞赛文件中心" })).toBeVisible();
   await page.getByRole("button", { name: "读取全部文件并分析" }).click();
@@ -50,9 +50,24 @@ test("student workflow parses rules, confirms eligibility, and unlocks generatio
   await page.getByRole("button", { name: "确认资格并继续" }).click();
   await expect(page.getByRole("heading", { name: "必须提交什么？" })).toBeVisible();
   await expect(page.getByText(/至少3张、最多5张/)).toBeVisible();
-  await page.getByRole("button", { name: "我已审阅提交成果" }).click();
-  await expect(page.getByRole("heading", { name: "方案生成" })).toBeVisible();
-  await expect(page.getByText("流程节点已解锁")).toBeVisible();
+  await page.getByRole("button", { name: "确认成果矩阵" }).click();
+  await expect(page.getByRole("heading", { name: "选择一个方案方向" })).toBeVisible();
+  await page.getByRole("button", { name: /批准 Second Life/ }).click();
+  await page.getByRole("button", { name: "生成3张竞赛视觉" }).click();
+  await expect(page.getByText(/演示AI样板|OpenAI真实生成/)).toBeVisible({ timeout: 120000 });
+  await page.getByRole("button", { name: "批准视觉并排版" }).click();
+  await expect(page.getByRole("heading", { name: "自动排版与文字" })).toBeVisible();
+  await page.getByRole("button", { name: "批准排版与文字" }).click();
+  await expect(page.getByRole("heading", { name: "最终审阅与提交" })).toBeVisible();
+
+  const packageDownload = page.waitForEvent("download");
+  await page.getByRole("button", { name: "下载提交包清单" }).click();
+  await expect((await packageDownload).suggestedFilename()).toMatch(/submission-package\.md$/);
+
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "模拟提交到竞赛网站" }).click();
+  await expect(page.getByRole("heading", { name: "模拟提交成功" })).toBeVisible();
+  await expect(page.getByText(/^NUG-\d{4}-/)).toBeVisible();
 });
 
 test("professional competition blocks a student from production", async ({ page }) => {

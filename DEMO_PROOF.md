@@ -7,6 +7,7 @@ Nugget is a complete local product demo, not a static mockup. The screenshots be
 - Main app: [http://localhost:3000](http://localhost:3000)
 - Instant completed demo: [http://localhost:3000/demo](http://localhost:3000/demo)
 - Global competition radar: [http://localhost:3000/discover](http://localhost:3000/discover)
+- Complete workflow: [http://localhost:3000/production?competition=real-leather-student-2026](http://localhost:3000/production?competition=real-leather-student-2026)
 
 Run:
 
@@ -51,6 +52,18 @@ Shows the official rules source, downloadable extracted summary, supplemental up
 Shows an explicit student eligibility verdict sourced from the competition rules before generation is unlocked.
 
 ![Board composer](artifacts/screenshots/12-board-composer.png)
+
+### Generated competition visuals
+
+![Generated visuals](artifacts/screenshots/13-generated-visuals.png)
+
+### Automatic board layout
+
+![Automatic layout](artifacts/screenshots/14-auto-layout.png)
+
+### Submission receipt
+
+![Submission receipt](artifacts/screenshots/15-submission-receipt.png)
 
 ### 1. Landing page
 
@@ -106,4 +119,4 @@ Shows the generated result and export controls at a 390 px mobile width.
 npm run demo:screenshots
 ```
 
-The script starts Nugget automatically when needed, exercises the main flow, and replaces all eight screenshots.
+The script starts Nugget automatically when needed, exercises the main flow, and replaces all 14 current screenshots.
