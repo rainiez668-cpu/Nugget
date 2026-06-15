@@ -39,3 +39,36 @@ export type SavedProject = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type CompetitionSource = {
+  name: string;
+  type: "official" | "association" | "media" | "wechat";
+  url: string;
+  verified: boolean;
+};
+
+export type CompetitionListing = {
+  id: string;
+  title: string;
+  translatedTitle: string;
+  organizer: string;
+  country: string;
+  countryCode: string;
+  language: string;
+  categories: string[];
+  competitionType: string;
+  deadline: string;
+  daysLeft: number;
+  entryFee: number;
+  feeCurrency: string;
+  prize: string;
+  prizeValueUsd: number;
+  eligibility: string[];
+  teamAllowed: boolean;
+  summary: string;
+  sourceGrade: "A" | "B" | "C";
+  sources: CompetitionSource[];
+  lastChecked: string;
+  featured?: boolean;
+  brief: string;
+};

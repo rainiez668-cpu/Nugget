@@ -16,7 +16,7 @@ import { AnalysisDashboard } from "@/components/analysis-dashboard";
 import { LoadingStudio } from "@/components/loading-studio";
 import { SAMPLE_BRIEF } from "@/lib/sample";
 import { exportJson, exportMarkdown } from "@/lib/export";
-import { saveProject, takeActiveProject } from "@/lib/storage";
+import { saveProject, takeActiveProject, takeImportedBrief } from "@/lib/storage";
 import type { CompetitionAnalysis, SavedProject } from "@/lib/types";
 
 type StudioProps = {
@@ -68,8 +68,14 @@ export function Studio({ demo = false }: StudioProps) {
       setAnalysis(active.analysis);
       setProjectId(active.id);
       setCreatedAt(active.createdAt);
-    } else if (demo) {
-      void analyze(SAMPLE_BRIEF);
+    } else {
+      const importedBrief = takeImportedBrief();
+      if (importedBrief) {
+        setBrief(importedBrief);
+        void analyze(importedBrief);
+      } else if (demo) {
+        void analyze(SAMPLE_BRIEF);
+      }
     }
   }, [analyze, demo]);
 

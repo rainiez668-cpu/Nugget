@@ -4,6 +4,7 @@ import type { SavedProject } from "@/lib/types";
 
 const STORAGE_KEY = "nugget-projects-v1";
 const ACTIVE_KEY = "nugget-active-project";
+const IMPORTED_BRIEF_KEY = "nugget-imported-brief";
 
 export function getProjects(): SavedProject[] {
   if (typeof window === "undefined") return [];
@@ -42,4 +43,14 @@ export function takeActiveProject(): SavedProject | null {
   } catch {
     return null;
   }
+}
+
+export function setImportedBrief(brief: string): void {
+  localStorage.setItem(IMPORTED_BRIEF_KEY, brief);
+}
+
+export function takeImportedBrief(): string | null {
+  const brief = localStorage.getItem(IMPORTED_BRIEF_KEY);
+  if (brief) localStorage.removeItem(IMPORTED_BRIEF_KEY);
+  return brief;
 }

@@ -6,6 +6,7 @@ Nugget is a complete local product demo, not a static mockup. The screenshots be
 
 - Main app: [http://localhost:3000](http://localhost:3000)
 - Instant completed demo: [http://localhost:3000/demo](http://localhost:3000/demo)
+- Global competition radar: [http://localhost:3000/discover](http://localhost:3000/discover)
 
 Run:
 
@@ -26,6 +27,18 @@ npm run dev
 8. Export **Markdown** or **JSON**.
 
 ## Visual Evidence
+
+### Global competition radar
+
+Shows multi-country, multilingual, cross-discipline discovery with free-entry-first ranking, prize and eligibility cards, filters, and source grades.
+
+![Global competition radar](artifacts/screenshots/09-global-radar.png)
+
+### Competition detail
+
+Shows deadline, fee, prize, eligibility, language, design categories, source evidence, and the one-click Studio handoff.
+
+![Competition detail](artifacts/screenshots/10-competition-detail.png)
 
 ### 1. Landing page
 

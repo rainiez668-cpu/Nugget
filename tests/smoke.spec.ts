@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("landing, analysis, save, and library flow", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /Find golden ideas/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Find the right competition/i })).toBeVisible();
 
   await page.goto("/studio");
   await page.getByTestId("sample-brief").click();
@@ -26,4 +26,17 @@ test("landing, analysis, save, and library flow", async ({ page }) => {
   await page.goto("/library");
   await page.getByRole("button", { name: /Delete RE:FORM/i }).click();
   await expect(page.getByText("Nothing on the shelf yet.")).toBeVisible();
+});
+
+test("discover radar filters competitions and sends a brief to Studio", async ({ page }) => {
+  await page.goto("/discover");
+  await expect(page.getByTestId("competition-grid")).toBeVisible();
+  await page.getByRole("button", { name: "只看免费比赛" }).click();
+  await expect(page.getByTestId("competition-grid").getByText("免费报名").first()).toBeVisible();
+
+  await page.getByTestId("view-seoul-river-rooms").click();
+  await expect(page.getByRole("complementary").getByRole("heading", { name: "首尔河岸微空间国际概念竞赛" })).toBeVisible();
+  await page.getByRole("button", { name: /用 Nugget 分析这场比赛/ }).click();
+  await expect(page.getByTestId("analysis-results")).toBeVisible();
+  await expect(page.getByText(/Seoul River Rooms International Ideas Competition/).first()).toBeVisible();
 });

@@ -2,11 +2,17 @@
 
 **Find golden ideas inside messy briefs.**
 
-Nugget is a cute, local-first AI competition studio for students and independent designers. It turns dense design competition briefs into a structured proposal package: requirements, hidden opportunities, risks, three concept directions, visual prompt packs, concept statements, board layouts, and submission checklists.
+Nugget is a global design competition radar and local-first AI studio for students and independent designers. It helps designers discover worthwhile open calls, understand fee, prize, eligibility, and deadline information, then turn the brief into a structured proposal package.
 
 ## Features
 
 - Portfolio-ready landing page and responsive product UI
+- Global competition radar across countries, languages, and design disciplines
+- Search, category, fee, eligibility, competition-type, prize, and deadline filters
+- Free-entry-first recommendation scoring
+- Source confidence grades, including official websites and WeChat sources
+- Competition detail panel with prize, eligibility, deadline, and source evidence
+- One-click handoff from a discovered competition into Studio analysis
 - Built-in realistic furniture competition brief
 - One-click `/demo` route with generated output
 - Structured mock AI analysis with three complete concept directions
@@ -34,17 +40,22 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-For the instant completed demo, open [http://localhost:3000/demo](http://localhost:3000/demo).
+Open the competition radar at [http://localhost:3000/discover](http://localhost:3000/discover).
+
+For the instant completed Studio demo, open [http://localhost:3000/demo](http://localhost:3000/demo).
 
 ## Demo Flow
 
-1. Open the app.
-2. Click **Start with a brief**.
-3. Click **Try sample brief**.
-4. Click **Analyze the brief**.
+1. Open **Discover**.
+2. Filter by free entry, discipline, eligibility, or competition type.
+3. Open a competition to inspect prize, eligibility, deadline, and sources.
+4. Click **用 Nugget 分析这场比赛**.
 5. Explore the requirements and three concept directions.
-6. Click **Save project**.
-7. Open **Library** to reopen, export, or delete the project.
+6. Save the project or export it as Markdown or JSON.
+
+## Discovery Data
+
+The current radar uses a comprehensive demonstration index designed to prove the product experience. It does not claim live whole-web coverage yet. A production release requires scheduled collectors, a database, multilingual search, source-specific parsers, deduplication, and daily deadline/source revalidation.
 
 ## Environment Variables
 

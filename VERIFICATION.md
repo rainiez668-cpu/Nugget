@@ -13,7 +13,7 @@ Verified on June 14, 2026 in Windows PowerShell with Node.js 22.14.0.
 | `npm run build` | Passed |
 | `npx playwright install chromium` | Passed |
 | `npm run demo:screenshots` | Passed; 8 screenshots created |
-| `npx playwright test` | Passed; 1 end-to-end test |
+| `npx playwright test` | Passed; 2 end-to-end tests |
 
 ## Errors Fixed
 
@@ -43,6 +43,10 @@ The built-in sample is the fictional **RE:FORM 2026 — International Student Fu
 - [x] Library displays the saved project.
 - [x] Saved project reopens in Studio.
 - [x] Saved project can be deleted.
+- [x] Global radar loads and displays open competitions.
+- [x] Free-entry filtering works.
+- [x] Competition details show prize, eligibility, deadline, and sources.
+- [x] A discovered competition opens and automatically analyzes in Studio.
 - [x] Desktop screenshots render without obvious breakage.
 - [x] Mobile landing and result views render at 390 px width.
 
@@ -53,6 +57,7 @@ The production build completed successfully with static pages for Landing, Studi
 ## Known Limitations
 
 - OpenAI and Anthropic adapters require the user’s own valid API key and were not called during verification.
+- The global radar currently uses a designed demo index. Production whole-web daily discovery still requires persistent backend collectors and source integrations.
 - Projects are browser-local and do not sync between devices.
 - Mock mode is strongest for the included architecture, furniture, and product-design style briefs.
 - No GIF was created; the eight required screenshots provide the visual proof set.

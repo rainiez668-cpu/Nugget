@@ -55,6 +55,13 @@ async function main() {
   await page.goto(baseUrl, { waitUntil: "networkidle" });
   await page.screenshot({ path: path.join(output, "01-landing.png"), fullPage: true });
 
+  await page.goto(`${baseUrl}/discover`, { waitUntil: "networkidle" });
+  await page.screenshot({ path: path.join(output, "09-global-radar.png"), fullPage: true });
+  await page.getByTestId("view-seoul-river-rooms").click();
+  await page.getByRole("complementary").getByRole("heading", { name: "首尔河岸微空间国际概念竞赛" }).waitFor();
+  await page.screenshot({ path: path.join(output, "10-competition-detail.png"), fullPage: false });
+  await page.getByRole("button", { name: "关闭详情" }).click();
+
   await page.goto(`${baseUrl}/studio`, { waitUntil: "networkidle" });
   await page.screenshot({ path: path.join(output, "02-studio-empty.png"), fullPage: true });
   await page.getByTestId("sample-brief").click();
@@ -92,7 +99,7 @@ async function main() {
   await mobile.screenshot({ path: path.join(output, "08-mobile-studio-result.png"), fullPage: false });
 
   await browser.close();
-  console.log(`Saved 8 screenshots to ${output}`);
+  console.log(`Saved 10 screenshots to ${output}`);
 }
 
 main()

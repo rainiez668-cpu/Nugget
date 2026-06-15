@@ -2,20 +2,20 @@ import Link from "next/link";
 import {
   ArrowRight,
   Check,
-  FileText,
-  Layers3,
-  Lightbulb,
-  PackageCheck,
+  Globe2,
+  ListFilter,
+  Search,
+  WandSparkles,
   Sparkles,
 } from "lucide-react";
 import { NuggetVisual } from "@/components/nugget-visual";
 import { SectionLabel } from "@/components/section-label";
 
 const workflow = [
-  { name: "Dig", copy: "Paste the messy brief.", icon: FileText, color: "bg-gold-soft" },
-  { name: "Hatch", copy: "Reveal three strong directions.", icon: Lightbulb, color: "bg-[#dce8d2]" },
-  { name: "Polish", copy: "Build prompts, words, and boards.", icon: Layers3, color: "bg-[#f8d6c9]" },
-  { name: "Pack", copy: "Export a submission-ready plan.", icon: PackageCheck, color: "bg-[#d9d6ef]" },
+  { name: "Discover", copy: "Scan global competitions daily.", icon: Globe2, color: "bg-gold-soft" },
+  { name: "Qualify", copy: "Check fee, prize, and eligibility.", icon: ListFilter, color: "bg-[#dce8d2]" },
+  { name: "Analyze", copy: "Decode the complete brief.", icon: Search, color: "bg-[#f8d6c9]" },
+  { name: "Create", copy: "Hatch a submission-ready direction.", icon: WandSparkles, color: "bg-[#d9d6ef]" },
 ];
 
 export default function Home() {
@@ -24,25 +24,24 @@ export default function Home() {
       <section className="overflow-hidden px-4 pb-20 pt-14 sm:px-6 sm:pt-20 lg:px-8">
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.08fr_.92fr]">
           <div>
-            <SectionLabel>AI competition studio for designers</SectionLabel>
+            <SectionLabel>Global competition radar for designers</SectionLabel>
             <h1 className="display mt-7 max-w-3xl text-6xl font-semibold leading-[0.96] sm:text-7xl lg:text-[92px]">
-              Find golden ideas inside <span className="relative whitespace-nowrap">
-                messy briefs.
+              Find the right competition. <span className="relative whitespace-nowrap">
+                Then win it.
                 <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 500 22" fill="none" aria-hidden="true">
                   <path d="M5 14C137 2 320 4 495 10" stroke="#F6BD3A" strokeWidth="10" strokeLinecap="round" />
                 </svg>
               </span>
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-8 text-ink/65 sm:text-xl">
-              Nugget turns dense design competition briefs into clear requirements, concept directions,
-              visual prompts, board plans, and a submission checklist.
+              Nugget finds open design competitions across countries, languages, and disciplines—free entry first—then turns the brief into a proposal kit.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link
-                href="/studio"
+                href="/discover"
                 className="group inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-4 font-bold text-white shadow-[0_8px_0_#d99f1d] transition hover:-translate-y-1"
               >
-                Start with a brief
+                Explore open competitions
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
@@ -54,7 +53,7 @@ export default function Home() {
               </Link>
             </div>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-ink/55">
-              {["No account", "Local-first", "Beautiful mock AI"].map((item) => (
+              {["Free entry first", "Prize & eligibility clear", "Daily discovery vision"].map((item) => (
                 <span key={item} className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-[#798c68]" /> {item}
                 </span>
@@ -69,11 +68,11 @@ export default function Home() {
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <SectionLabel>From brief to board</SectionLabel>
-              <h2 className="display mt-5 text-4xl font-semibold sm:text-5xl">A tiny studio with a clear rhythm.</h2>
+              <SectionLabel>From discovery to submission</SectionLabel>
+              <h2 className="display mt-5 text-4xl font-semibold sm:text-5xl">One radar. Every design discipline.</h2>
             </div>
             <p className="max-w-md leading-7 text-ink/60">
-              Keep the spark. Lose the spreadsheet panic. Nugget turns ambiguity into a sequence you can design through.
+              Architecture, landscape, interiors, products, graphics, digital experiences, fashion, social innovation, and the categories still emerging.
             </p>
           </div>
           <div className="mt-12 grid gap-4 md:grid-cols-4">
@@ -144,10 +143,10 @@ export default function Home() {
 
       <section className="px-4 pb-24 sm:px-6 lg:px-8">
         <div className="grain mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] border-2 border-ink bg-gold p-8 text-center shadow-[8px_8px_0_#201d17] sm:p-14">
-          <h2 className="display text-4xl font-semibold sm:text-6xl">Your next idea is already in the brief.</h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-ink/70">Let’s dig it out, give it shape, and get it onto the board.</p>
-          <Link href="/studio" className="mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-7 py-4 font-bold text-white">
-            Open the studio <ArrowRight className="h-4 w-4" />
+          <h2 className="display text-4xl font-semibold sm:text-6xl">The right brief may be anywhere in the world.</h2>
+          <p className="mx-auto mt-4 max-w-xl text-lg text-ink/70">Start with the opportunities worth your time, then let Nugget help you shape the entry.</p>
+          <Link href="/discover" className="mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-7 py-4 font-bold text-white">
+            Open the global radar <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>
