@@ -57,8 +57,8 @@ async function main() {
 
   await page.goto(`${baseUrl}/discover`, { waitUntil: "networkidle" });
   await page.screenshot({ path: path.join(output, "09-global-radar.png"), fullPage: true });
-  await page.getByTestId("view-seoul-river-rooms").click();
-  await page.getByRole("complementary").getByRole("heading", { name: "首尔河岸微空间国际概念竞赛" }).waitFor();
+  await page.getByTestId("view-pohang-museum-2026").click();
+  await page.getByRole("complementary").getByRole("heading", { name: "韩国浦项博物馆国际设计竞赛" }).waitFor();
   await page.screenshot({ path: path.join(output, "10-competition-detail.png"), fullPage: false });
   await page.getByRole("button", { name: "关闭详情" }).click();
 

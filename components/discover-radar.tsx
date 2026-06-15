@@ -28,6 +28,7 @@ import {
   DESIGN_CATEGORIES,
   competitionScore,
   competitions,
+  competitionSources,
 } from "@/lib/competitions";
 import { setImportedBrief } from "@/lib/storage";
 import type { CompetitionListing } from "@/lib/types";
@@ -83,7 +84,7 @@ function DetailPanel({
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             {[
               { icon: CalendarClock, label: "投稿截止", value: `${item.deadline} · 剩余 ${item.daysLeft} 天` },
-              { icon: CircleDollarSign, label: "报名费用", value: item.entryFee === 0 ? "免费" : `${item.feeCurrency} ${item.entryFee}` },
+              { icon: CircleDollarSign, label: "报名费用", value: item.entryFee === 0 ? "免费" : item.entryFee < 0 ? "费用见官网" : `${item.feeCurrency} ${item.entryFee}` },
               { icon: Banknote, label: "奖金与机会", value: item.prize },
               { icon: Languages, label: "发布语言", value: item.language },
             ].map((fact) => (
@@ -125,7 +126,7 @@ function DetailPanel({
             </div>
             <div className="mt-3 space-y-2">
               {item.sources.map((source) => (
-                <div key={source.name} className="flex items-center justify-between rounded-2xl border border-ink/10 bg-white p-4">
+                <a key={source.name} href={source.url} target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-2xl border border-ink/10 bg-white p-4 transition hover:border-gold hover:bg-gold-soft/30">
                   <div className="flex items-center gap-3">
                     <span className={`grid h-9 w-9 place-items-center rounded-xl ${source.type === "wechat" ? "bg-[#dce8d2]" : "bg-gold-soft"}`}>
                       {source.type === "wechat" ? <Radio className="h-4 w-4" /> : <Globe2 className="h-4 w-4" />}
@@ -135,8 +136,11 @@ function DetailPanel({
                       <p className="text-xs text-ink/40">{source.type === "wechat" ? "微信公众号来源" : "公开网页来源"}</p>
                     </div>
                   </div>
-                  {source.verified && <BadgeCheck className="h-5 w-5 text-[#648053]" />}
-                </div>
+                  <div className="flex items-center gap-2">
+                    {source.verified && <BadgeCheck className="h-5 w-5 text-[#648053]" />}
+                    <ArrowUpRight className="h-4 w-4 text-ink/40" />
+                  </div>
+                </a>
               ))}
             </div>
           </section>
@@ -182,7 +186,7 @@ export function DiscoverRadar() {
         if (category !== "全部类别" && !item.categories.includes(category)) return false;
         if (type !== "全部类型" && item.competitionType !== type) return false;
         if (fee === "free" && item.entryFee !== 0) return false;
-        if (fee === "paid" && item.entryFee === 0) return false;
+        if (fee === "paid" && item.entryFee <= 0) return false;
         if (eligibility === "学生可参加" && !item.eligibility.some((value) => /学生|在校|毕业/.test(value))) return false;
         if (eligibility === "全球开放" && !item.eligibility.some((value) => /全球/.test(value))) return false;
         if (eligibility === "专业资格" && !item.eligibility.some((value) => /注册|专业|执业/.test(value))) return false;
@@ -226,8 +230,8 @@ export function DiscoverRadar() {
             <div className="grid grid-cols-3 gap-2">
               {[
                 { value: "22+", label: "设计类别" },
-                { value: "12", label: "国家与地区" },
-                { value: "4", label: "来源类型" },
+                { value: `${competitions.length}`, label: "已核验条目" },
+                { value: `${competitionSources.length}`, label: "持续更新来源" },
               ].map((stat) => (
                 <div key={stat.label} className="rounded-3xl border border-ink/10 bg-paper p-4 text-center shadow-card">
                   <p className="display text-3xl font-semibold">{stat.value}</p>
@@ -296,7 +300,7 @@ export function DiscoverRadar() {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-black">找到 {results.length} 场仍可投稿的比赛</p>
-              <p className="mt-1 text-xs text-ink/45">演示数据集 · 生产版本将接入每日抓取与重新核验</p>
+              <p className="mt-1 text-xs text-ink/45">首批真实核验条目 · 不是全网总量 · 持续扩充中</p>
             </div>
             <div className="flex items-center gap-2 text-xs font-bold text-ink/45">
               <SlidersHorizontal className="h-4 w-4" /> 默认综合免费、奖金、可信度和准备时间
@@ -311,6 +315,8 @@ export function DiscoverRadar() {
                     <div className="flex flex-wrap gap-2">
                       {item.entryFee === 0 ? (
                         <span className="rounded-full bg-gold px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.1em]">免费报名</span>
+                      ) : item.entryFee < 0 ? (
+                        <span className="rounded-full bg-[#eee9df] px-3 py-1.5 text-[10px] font-black">费用见官网</span>
                       ) : (
                         <span className="rounded-full bg-[#eee9df] px-3 py-1.5 text-[10px] font-black">{item.feeCurrency} {item.entryFee}</span>
                       )}
@@ -348,11 +354,16 @@ export function DiscoverRadar() {
                     <span className="rounded-full border border-ink/10 px-2.5 py-1 text-[10px] font-bold text-ink/55">{item.competitionType}</span>
                   </div>
 
-                  <div className="mt-5 flex items-center justify-between border-t border-ink/10 pt-4">
+                  <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-4">
                     <span className="inline-flex items-center gap-2 text-xs font-bold text-ink/50"><Clock3 className="h-4 w-4" /> 截止 {item.deadline}</span>
-                    <button data-testid={`view-${item.id}`} type="button" onClick={() => setSelected(item)} className="inline-flex items-center gap-1.5 text-xs font-black transition group-hover:text-[#9a6900]">
-                      查看完整信息 <ArrowUpRight className="h-4 w-4" />
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <a href={item.sources[0].url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-black text-[#8b6208]">
+                        访问原始页面 <ArrowUpRight className="h-3.5 w-3.5" />
+                      </a>
+                      <button data-testid={`view-${item.id}`} type="button" onClick={() => setSelected(item)} className="text-xs font-black transition group-hover:text-[#9a6900]">
+                        查看详情
+                      </button>
+                    </div>
                   </div>
                 </div>
               </article>
@@ -368,6 +379,31 @@ export function DiscoverRadar() {
               </button>
             </div>
           )}
+
+          <section className="mt-10 rounded-[2rem] border border-ink/10 bg-ink p-6 text-white shadow-soft sm:p-8">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-gold">Continue exploring</p>
+                <h2 className="display mt-2 text-3xl font-semibold sm:text-4xl">这里不是只有 {competitions.length} 场。</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
+                  上面是已整理成统一字段的首批真实条目。下面这些来源持续发布数百场比赛，可以直接打开查看原文；后续采集器会逐步把它们结构化进雷达。
+                </p>
+              </div>
+              <span className="rounded-full bg-white/10 px-4 py-2 text-xs font-bold text-white/70">链接均在新窗口打开</span>
+            </div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {competitionSources.map((source) => (
+                <a key={source.name} href={source.url} target="_blank" rel="noreferrer" className="group rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-gold/60 hover:bg-white/10">
+                  <div className="flex items-center justify-between">
+                    <Globe2 className="h-5 w-5 text-gold" />
+                    <ArrowUpRight className="h-4 w-4 text-white/35 transition group-hover:text-gold" />
+                  </div>
+                  <p className="mt-4 font-black">{source.name}</p>
+                  <p className="mt-1 text-xs leading-5 text-white/45">{source.note}</p>
+                </a>
+              ))}
+            </div>
+          </section>
         </div>
       </section>
 
