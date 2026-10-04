@@ -108,15 +108,16 @@ export function Studio({ demo = false }: StudioProps) {
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-paper px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] shadow-sm">
-                <Gem className="h-3.5 w-3.5 text-[#b77c00]" /> The studio
+                <Gem className="h-3.5 w-3.5 text-[#b77c00]" /> 设计工作室
               </span>
               <span className="rounded-full bg-[#e4ecdc] px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-[#4d6541]">
-                Demo mode · {provider} AI
+                演示模式 · 模拟AI
               </span>
             </div>
-            <h1 className="display mt-5 text-5xl font-semibold sm:text-6xl">What are we digging into?</h1>
+            <h1 className="display mt-5 text-5xl font-semibold sm:text-6xl">我们将要研究什么？</h1>
             <p className="mt-3 max-w-2xl text-lg leading-7 text-ink/60">
-              Drop in the competition brief. Nugget will separate the rules from the openings and hatch three directions worth exploring.
+              放入竞赛 Brief。<br />
+              Nugget 会梳理硬性要求与潜在机会，并生成三个值得探索的设计方向。
             </p>
           </div>
           {analysis && (
@@ -129,7 +130,7 @@ export function Studio({ demo = false }: StudioProps) {
               }}
               className="inline-flex items-center gap-2 text-sm font-bold text-ink/55 hover:text-ink"
             >
-              <RotateCcw className="h-4 w-4" /> Start fresh
+              <RotateCcw className="h-4 w-4" /> 新建分析
             </button>
           )}
         </div>
@@ -137,15 +138,15 @@ export function Studio({ demo = false }: StudioProps) {
         <section className="mt-9 rounded-[2.25rem] border border-ink/10 bg-paper p-3 shadow-soft sm:p-5">
           <div className="rounded-3xl border border-ink/10 bg-cream p-4 sm:p-6">
             <div className="flex items-center justify-between gap-4">
-              <label htmlFor="brief" className="text-sm font-bold">Competition brief</label>
-              <span className="text-xs font-semibold text-ink/35">{brief.length.toLocaleString()} characters</span>
+              <label htmlFor="brief" className="text-sm font-bold">竞赛 Brief</label>
+              <span className="text-xs font-semibold text-ink/35">{brief.length.toLocaleString()} 个字符</span>
             </div>
             <textarea
               id="brief"
               data-testid="brief-input"
               value={brief}
               onChange={(event) => setBrief(event.target.value)}
-              placeholder="Paste the full competition brief here — deadlines, deliverables, judging criteria, all of it..."
+              placeholder="在这里粘贴完整的竞赛 Brief——截止日期、提交要求、评审标准等全部内容……"
               className="scrollbar-thin mt-3 min-h-[260px] w-full resize-y rounded-2xl border border-ink/10 bg-white p-5 text-[15px] leading-7 outline-none transition placeholder:text-ink/30 focus:border-gold focus:ring-4 focus:ring-gold/15"
             />
             {error && <p role="alert" className="mt-3 rounded-xl bg-[#f9e0d7] px-4 py-3 text-sm font-semibold text-[#8a3f29]">{error}</p>}
@@ -159,7 +160,7 @@ export function Studio({ demo = false }: StudioProps) {
                 }}
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/15 bg-white px-5 py-3 text-sm font-bold transition hover:bg-gold-soft"
               >
-                <Sparkles className="h-4 w-4" /> Try sample brief
+                <Sparkles className="h-4 w-4" /> 试用示例 Brief
               </button>
               <button
                 data-testid="analyze-button"
@@ -168,7 +169,7 @@ export function Studio({ demo = false }: StudioProps) {
                 onClick={() => void analyze()}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-bold text-white shadow-[0_5px_0_#d99f1d] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-35 disabled:shadow-none"
               >
-                <WandSparkles className="h-4 w-4" /> Analyze the brief
+                <WandSparkles className="h-4 w-4" /> 分析 Brief
               </button>
             </div>
           </div>
@@ -179,7 +180,7 @@ export function Studio({ demo = false }: StudioProps) {
         {analysis && !loading && (
           <div id="results" className="scroll-mt-24 pt-10">
             <div className="sticky top-[82px] z-40 mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-ink/10 bg-paper/90 p-3 shadow-card backdrop-blur-xl">
-              <p className="hidden pl-2 text-sm font-semibold text-ink/55 sm:block">Your proposal kit is ready.</p>
+              <p className="hidden pl-2 text-sm font-semibold text-ink/55 sm:block">你的提案方案包已生成。</p>
               <div className="flex w-full flex-wrap gap-2 sm:w-auto">
                 <button
                   data-testid="save-project"
@@ -190,7 +191,7 @@ export function Studio({ demo = false }: StudioProps) {
                   }`}
                 >
                   {saved ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />}
-                  {saved ? "Saved locally" : "Save project"}
+                  {saved ? "已保存至本地" : "保存项目"}
                 </button>
                 <button type="button" onClick={() => currentProject && exportMarkdown(currentProject)} className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2.5 text-xs font-bold hover:bg-cream sm:flex-none">
                   <Download className="h-4 w-4" /> Markdown
@@ -203,7 +204,7 @@ export function Studio({ demo = false }: StudioProps) {
             <AnalysisDashboard analysis={analysis} />
             <div className="mt-8 flex justify-center">
               <button type="button" onClick={() => router.push("/library")} className="rounded-full border border-ink/15 bg-paper px-6 py-3 text-sm font-bold shadow-sm hover:bg-gold-soft">
-                Visit your project library
+                前往你的项目库
               </button>
             </div>
           </div>

@@ -240,7 +240,7 @@ export function DiscoverRadar() {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-paper px-3 py-1.5 text-xs font-black uppercase tracking-[0.14em] shadow-sm">
-                  <Radio className="h-3.5 w-3.5 text-[#a87300]" /> Global design radar
+                  <Radio className="h-3.5 w-3.5 text-[#a87300]" /> 全球竞赛雷达
                 </span>
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#dce8d2] px-3 py-1.5 text-xs font-bold text-[#405b35]">
                   <span className="h-2 w-2 rounded-full bg-[#6c8e59]" /> 每日更新演示
@@ -250,7 +250,7 @@ export function DiscoverRadar() {
                 全球设计比赛，<br /><span className="text-[#a87300]">先看值不值得参加。</span>
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-8 text-ink/60">
-                跨国家、跨语言、跨设计类别持续发现仍可投稿的比赛。免费优先，奖金、资格和截止日期一眼看清。
+                跨国家、跨语言、跨设计类别，持续发现仍可投稿的比赛。<br />免费优先，奖金、资格和截止日期一目了然。
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2">

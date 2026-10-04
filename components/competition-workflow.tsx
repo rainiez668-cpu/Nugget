@@ -223,7 +223,7 @@ export function CompetitionWorkflow() {
 
         <main className="min-w-0 p-4 sm:p-7 lg:p-9">
           {active === "documents" && (
-            <Section eyebrow="01 · DOCUMENT INGESTION" title="竞赛文件中心" description="保存官方原文与本地解析依据，再开始生产。">
+            <Section testId="workflow-documents" eyebrow="01 · DOCUMENT INGESTION" title="竞赛文件中心" description="保存官方原文与本地解析依据，再开始生产。">
               <div className="grid gap-5 xl:grid-cols-[1fr_340px]">
                 <div className="overflow-hidden rounded-3xl border border-ink/10 bg-paper shadow-card">
                   {(rules?.documents ?? competition.sources.map((source) => ({
@@ -237,23 +237,23 @@ export function CompetitionWorkflow() {
                 </div>
                 <div className="space-y-4">
                   <div className="rounded-3xl border border-dashed border-ink/20 bg-paper p-5 text-center"><Upload className="mx-auto h-7 w-7 text-ink/35" /><p className="mt-3 text-sm font-black">补充上传细则</p><p className="mt-1 text-xs text-ink/45">PDF、DOCX、图片或网页链接</p></div>
-                  <ActionButton busy={busy === "documents"} done={completed.includes("documents")} onClick={() => simulate("documents", 900, () => complete("documents", "eligibility"))} label="读取全部文件并分析" doneLabel="文件已解析" />
+                  <ActionButton testId="analyze-competition-files" busy={busy === "documents"} done={completed.includes("documents")} onClick={() => simulate("documents", 900, () => complete("documents", "eligibility"))} label="读取全部文件并分析" doneLabel="文件已解析" />
                 </div>
               </div>
             </Section>
           )}
 
           {active === "eligibility" && (
-            <Section eyebrow="02 · ELIGIBILITY GATE" title="你到底能不能参加？" description="系统引用官方规则给出硬结论。">
+            <Section testId="workflow-eligibility" eyebrow="02 · ELIGIBILITY GATE" title="你到底能不能参加？" description="系统引用官方规则给出硬结论。">
               <div className={`rounded-3xl border p-6 shadow-card ${eligible ? "border-[#9bb58d] bg-[#e4ecdc]" : "border-[#d49a7f] bg-[#f9e0d7]"}`}>
                 <div className="flex justify-between gap-5"><div><p className="text-xs font-black uppercase tracking-[.15em] opacity-50">Eligibility verdict</p><h3 className="display mt-2 text-4xl font-semibold">{rules?.verdict ?? (eligible ? "当前身份可参加" : "当前身份不符合")}</h3><p className="mt-4 max-w-3xl text-sm leading-7 opacity-75">{rules?.verdictDetail ?? competition.eligibility.join("；")}</p></div>{eligible ? <BadgeCheck className="h-12 w-12 text-[#587247]" /> : <AlertTriangle className="h-12 w-12 text-[#a84f32]" />}</div>
               </div>
-              <div className="mt-5 flex justify-end"><button disabled={!eligible} onClick={() => complete("eligibility", "deliverables")} className="rounded-full bg-ink px-6 py-3.5 text-sm font-black text-white disabled:opacity-30">确认资格并继续</button></div>
+              <div className="mt-5 flex justify-end"><button data-testid="confirm-eligibility" disabled={!eligible} onClick={() => complete("eligibility", "deliverables")} className="rounded-full bg-ink px-6 py-3.5 text-sm font-black text-white disabled:opacity-30">确认资格并继续</button></div>
             </Section>
           )}
 
           {active === "deliverables" && (
-            <Section eyebrow="03 · DELIVERABLE MATRIX" title="必须提交什么？" description="后续生成只围绕已经确认的成果矩阵工作。">
+            <Section testId="workflow-deliverables" eyebrow="03 · DELIVERABLE MATRIX" title="必须提交什么？" description="后续生成只围绕已经确认的成果矩阵工作。">
               <div className="overflow-hidden rounded-3xl border border-ink/10 bg-paper shadow-card">
                 {deliverables.map((item, index) => <div key={item} className={`flex gap-4 p-5 ${index ? "border-t border-ink/10" : ""}`}><span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gold text-xs font-black">{index + 1}</span><p className="text-sm font-bold leading-6">{item}</p></div>)}
               </div>
@@ -295,31 +295,31 @@ export function CompetitionWorkflow() {
                 </div>
               </div>
               <div className="mt-5 rounded-3xl bg-ink p-6 text-white"><p className="text-xs font-black uppercase tracking-[.15em] text-gold">AI与原创规则</p><p className="mt-3 text-sm leading-7 text-white/65">{rules?.aiRule ?? "未提取到明确AI限制；最终提交前必须再次核对官方规则。"}</p></div>
-              <div className="mt-5 flex justify-end"><button disabled={!assetCountConfirmed} onClick={() => complete("deliverables", "concept")} className="rounded-full bg-gold px-6 py-3.5 text-sm font-black disabled:opacity-30">确认成果矩阵与数量</button></div>
+              <div className="mt-5 flex justify-end"><button data-testid="confirm-deliverables" disabled={!assetCountConfirmed} onClick={() => complete("deliverables", "concept")} className="rounded-full bg-gold px-6 py-3.5 text-sm font-black disabled:opacity-30">确认成果矩阵与数量</button></div>
             </Section>
           )}
 
           {active === "concept" && (
-            <Section eyebrow="04 · CONCEPT GENERATION" title="选择一个方案方向" description="Nugget生成三个可比较方向；你批准后才进入生图。">
+            <Section testId="workflow-concept" eyebrow="04 · CONCEPT GENERATION" title="选择一个方案方向" description="Nugget生成三个可比较方向；你批准后才进入生图。">
               <div className="grid gap-4 lg:grid-cols-3">
                 {concepts.map((item, index) => <button key={item.title} onClick={() => { setSelectedConcept(index); setSelectedLayout(0); }} className={`rounded-3xl border p-5 text-left shadow-card transition ${selectedConcept === index ? "border-gold bg-[#fff5d8] ring-2 ring-gold/30" : "border-ink/10 bg-paper hover:-translate-y-1"}`}><p className="text-[10px] font-black text-ink/35">DIRECTION 0{index + 1}</p><h3 className="display mt-3 text-3xl font-semibold">{item.title}</h3><p className="mt-2 text-sm font-bold text-[#8b6208]">{item.tagline}</p><p className="mt-4 text-xs leading-6 text-ink/55">{item.strategy}</p><div className="mt-5 flex flex-wrap gap-1.5">{item.palette.map((color) => <span key={color} className="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold">{color}</span>)}</div></button>)}
               </div>
-              <div className="mt-5 flex justify-end"><button onClick={() => { setStatement(concept.statement); complete("concept", "assets"); }} className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-black text-white">批准 {concept.title}<ChevronRight className="h-4 w-4" /></button></div>
+              <div className="mt-5 flex justify-end"><button data-testid="approve-concept" onClick={() => { setStatement(concept.statement); complete("concept", "assets"); }} className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-black text-white">批准 {concept.title}<ChevronRight className="h-4 w-4" /></button></div>
             </Section>
           )}
 
           {active === "assets" && (
-            <Section eyebrow="05 · IMAGE GENERATION" title="生成竞赛视觉" description="有OpenAI密钥时真实生成；没有密钥时使用内置AI样板完成体验。">
+            <Section testId="workflow-assets" eyebrow="05 · IMAGE GENERATION" title="生成竞赛视觉" description="有OpenAI密钥时真实生成；没有密钥时使用内置AI样板完成体验。">
               {assets.length === 0 ? (
-                <div className="rounded-3xl border border-dashed border-ink/20 bg-paper p-12 text-center shadow-card"><span className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-gold-soft"><WandSparkles className="h-7 w-7" /></span><h3 className="display mt-5 text-3xl font-semibold">{assetCount}个成果提示词已经准备好</h3><p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-ink/55">每张图对应一个成果角色，并保持同一方案、材料、比例和视觉语言。</p><div className="mx-auto mt-4 flex max-w-2xl flex-wrap justify-center gap-2">{assetPlan.roles.slice(0, assetCount).map((role, index) => <span key={role} className="rounded-full bg-cream px-3 py-1.5 text-[10px] font-black">V0{index + 1} · {role}</span>)}</div><button onClick={() => void generateAssets()} disabled={busy === "assets"} className="mt-6 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-black text-white">{busy === "assets" ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}{busy === "assets" ? `正在生成 ${assetCount} 张...` : `生成 ${assetCount} 张竞赛视觉`}</button></div>
+                <div className="rounded-3xl border border-dashed border-ink/20 bg-paper p-12 text-center shadow-card"><span className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-gold-soft"><WandSparkles className="h-7 w-7" /></span><h3 className="display mt-5 text-3xl font-semibold">{assetCount}个成果提示词已经准备好</h3><p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-ink/55">每张图对应一个成果角色，并保持同一方案、材料、比例和视觉语言。</p><div className="mx-auto mt-4 flex max-w-2xl flex-wrap justify-center gap-2">{assetPlan.roles.slice(0, assetCount).map((role, index) => <span key={role} className="rounded-full bg-cream px-3 py-1.5 text-[10px] font-black">V0{index + 1} · {role}</span>)}</div><button data-testid="generate-assets" onClick={() => void generateAssets()} disabled={busy === "assets"} className="mt-6 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-black text-white">{busy === "assets" ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}{busy === "assets" ? `正在生成 ${assetCount} 张...` : `生成 ${assetCount} 张竞赛视觉`}</button></div>
               ) : (
-                <><div className="mb-4 flex justify-between"><span className="rounded-full bg-[#dce8d2] px-3 py-1.5 text-xs font-black text-[#405b35]">{imageProvider === "openai" ? "OpenAI真实生成" : "演示AI样板"} · {assets.length}张</span><button onClick={() => setAssets([])} className="text-xs font-black text-[#8b6208]">重新生成</button></div><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{assets.map((src, index) => <div key={index} className="overflow-hidden rounded-3xl border border-ink/10 bg-paper shadow-card"><div className="relative aspect-[4/3]"><Image src={src} alt={`Generated competition visual ${index + 1}`} fill unoptimized={src.startsWith("data:")} className="object-cover" /></div><div className="p-4"><p className="font-black">V{String(index + 1).padStart(2, "0")} · {assetPlan.roles[index] ?? `补充视觉 ${index + 1}`}</p><p className="mt-1 text-xs text-ink/45">对应成果矩阵，可单独重做或替换</p></div></div>)}</div><div className="mt-5 flex justify-end"><button onClick={() => complete("assets", "layout")} className="rounded-full bg-gold px-6 py-3.5 text-sm font-black">批准视觉并排版</button></div></>
+                <><div data-testid="generated-assets" className="mb-4 flex justify-between"><span className="rounded-full bg-[#dce8d2] px-3 py-1.5 text-xs font-black text-[#405b35]">{imageProvider === "openai" ? "OpenAI真实生成" : "演示AI样板"} · {assets.length}张</span><button onClick={() => setAssets([])} className="text-xs font-black text-[#8b6208]">重新生成</button></div><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{assets.map((src, index) => <div key={index} className="overflow-hidden rounded-3xl border border-ink/10 bg-paper shadow-card"><div className="relative aspect-[4/3]"><Image src={src} alt={`Generated competition visual ${index + 1}`} fill unoptimized={src.startsWith("data:")} className="object-cover" /></div><div className="p-4"><p className="font-black">V{String(index + 1).padStart(2, "0")} · {assetPlan.roles[index] ?? `补充视觉 ${index + 1}`}</p><p className="mt-1 text-xs text-ink/45">对应成果矩阵，可单独重做或替换</p></div></div>)}</div><div className="mt-5 flex justify-end"><button data-testid="approve-assets" onClick={() => complete("assets", "layout")} className="rounded-full bg-gold px-6 py-3.5 text-sm font-black">批准视觉并排版</button></div></>
               )}
             </Section>
           )}
 
           {active === "layout" && (
-            <Section eyebrow="06 · LAYOUT & COPY" title="选择版式方向" description="系统根据比赛类别、概念驱动和成果结构推荐三个不同构图；你决定最终阅读顺序。">
+            <Section testId="workflow-layout" eyebrow="06 · LAYOUT & COPY" title="选择版式方向" description="系统根据比赛类别、概念驱动和成果结构推荐三个不同构图；你决定最终阅读顺序。">
               <div className="mb-5 grid gap-3 md:grid-cols-3">
                 {layouts.map((item, index) => (
                   <button
@@ -359,12 +359,12 @@ export function CompetitionWorkflow() {
                 </div>
                 <div className="rounded-3xl border border-ink/10 bg-paper p-5 shadow-card"><label className="text-xs font-black">设计说明</label><textarea value={statement} onChange={(event) => setStatement(event.target.value)} className="mt-3 min-h-64 w-full rounded-2xl border border-ink/10 bg-cream p-4 text-sm leading-7 outline-none focus:border-gold" /><p className="mt-2 text-right text-xs font-bold text-ink/35">{statementLimit.unit === "words" ? (statement.trim() ? statement.trim().split(/\s+/).length : 0) : statement.length}{statementLimit.limit ? ` / ${statementLimit.limit} ${statementLimit.unit}` : " · 官方未注明字数上限"}</p></div>
               </div>
-              <div className="mt-5 flex justify-end"><button onClick={() => complete("layout", "review")} className="rounded-full bg-ink px-6 py-3.5 text-sm font-black text-white">批准排版与文字</button></div>
+              <div className="mt-5 flex justify-end"><button data-testid="approve-layout" onClick={() => complete("layout", "review")} className="rounded-full bg-ink px-6 py-3.5 text-sm font-black text-white">批准排版与文字</button></div>
             </Section>
           )}
 
           {active === "review" && (
-            <Section eyebrow="07 · REVIEW & SUBMISSION" title={submitted ? "模拟提交成功" : "最终审阅与提交"} description="真实网站上传需要账号、验证码和最终签署；这里完整模拟提交并生成可下载的交付包。">
+            <Section testId="workflow-review" eyebrow="07 · REVIEW & SUBMISSION" title={submitted ? "模拟提交成功" : "最终审阅与提交"} description="真实网站上传需要账号、验证码和最终签署；这里完整模拟提交并生成可下载的交付包。">
               {!submitted ? (
                 <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
                   <div className="overflow-hidden rounded-3xl border border-ink/10 bg-paper shadow-card">
@@ -373,7 +373,7 @@ export function CompetitionWorkflow() {
                   <div className="space-y-4">
                     <button onClick={downloadPackage} className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink/10 bg-paper px-5 py-3.5 text-sm font-black"><Download className="h-4 w-4" />下载提交包清单</button>
                     <label className="flex gap-3 rounded-2xl border border-ink/10 bg-paper p-4"><input type="checkbox" checked={reviewed} onChange={(event) => setReviewed(event.target.checked)} className="mt-1 accent-[#201d17]" /><span className="text-xs font-bold leading-5">我已确认资格、版权、技术可行性和最终文件，并授权执行模拟提交。</span></label>
-                    <button disabled={!reviewed || busy === "submit"} onClick={() => simulate("submit", 1300, () => { setSubmitted(true); complete("review"); })} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-5 py-3.5 text-sm font-black text-white disabled:opacity-30">{busy === "submit" ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}{busy === "submit" ? "正在上传并校验..." : "模拟提交到竞赛网站"}</button>
+                    <button data-testid="submit-competition" disabled={!reviewed || busy === "submit"} onClick={() => simulate("submit", 1300, () => { setSubmitted(true); complete("review"); })} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-5 py-3.5 text-sm font-black text-white disabled:opacity-30">{busy === "submit" ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}{busy === "submit" ? "正在上传并校验..." : "模拟提交到竞赛网站"}</button>
                   </div>
                 </div>
               ) : (
@@ -387,10 +387,10 @@ export function CompetitionWorkflow() {
   );
 }
 
-function Section({ eyebrow, title, description, children }: { eyebrow: string; title: string; description: string; children: React.ReactNode }) {
-  return <section><p className="text-[10px] font-black uppercase tracking-[.18em] text-[#9a6900]">{eyebrow}</p><h2 className="display mt-3 text-4xl font-semibold sm:text-5xl">{title}</h2><p className="mt-3 max-w-3xl text-sm leading-7 text-ink/55">{description}</p><div className="mt-7">{children}</div></section>;
+function Section({ testId, eyebrow, title, description, children }: { testId?: string; eyebrow: string; title: string; description: string; children: React.ReactNode }) {
+  return <section data-testid={testId}><p className="text-[10px] font-black uppercase tracking-[.18em] text-[#9a6900]">{eyebrow}</p><h2 className="display mt-3 text-4xl font-semibold sm:text-5xl">{title}</h2><p className="mt-3 max-w-3xl text-sm leading-7 text-ink/55">{description}</p><div className="mt-7">{children}</div></section>;
 }
 
-function ActionButton({ busy, done, onClick, label, doneLabel }: { busy: boolean; done: boolean; onClick: () => void; label: string; doneLabel: string }) {
-  return <button type="button" onClick={onClick} disabled={busy || done} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-5 py-3.5 text-sm font-black text-white disabled:opacity-50">{busy ? <LoaderCircle className="h-4 w-4 animate-spin" /> : done ? <CheckCircle2 className="h-4 w-4 text-gold" /> : <ScanSearch className="h-4 w-4" />}{busy ? "正在处理..." : done ? doneLabel : label}</button>;
+function ActionButton({ testId, busy, done, onClick, label, doneLabel }: { testId?: string; busy: boolean; done: boolean; onClick: () => void; label: string; doneLabel: string }) {
+  return <button data-testid={testId} type="button" onClick={onClick} disabled={busy || done} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-5 py-3.5 text-sm font-black text-white disabled:opacity-50">{busy ? <LoaderCircle className="h-4 w-4 animate-spin" /> : done ? <CheckCircle2 className="h-4 w-4 text-gold" /> : <ScanSearch className="h-4 w-4" />}{busy ? "正在处理..." : done ? doneLabel : label}</button>;
 }

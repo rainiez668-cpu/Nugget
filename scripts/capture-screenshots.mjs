@@ -5,30 +5,45 @@ import path from "node:path";
 
 const root = process.cwd();
 const output = path.join(root, "artifacts", "screenshots");
-const baseUrl = process.env.NUGGET_URL ?? "http://127.0.0.1:3000";
+const baseUrl = process.env.NUGGET_URL ?? "http://127.0.0.1:3100";
+const serverPort = new URL(baseUrl).port || "3100";
 let server;
 
-async function waitForServer(url, timeout = 90000) {
+async function isHealthyNuggetServer() {
+  const response = await fetch(`${baseUrl}/production?competition=real-leather-student-2026`);
+  if (!response.ok) return false;
+
+  const html = await response.text();
+  if (!html.includes("竞赛文件中心")) return false;
+
+  const stylesheets = [...html.matchAll(/href="([^\"]+\.css[^\"]*)"/g)];
+  if (stylesheets.length === 0) return false;
+
+  const stylesheetResponses = await Promise.all(
+    stylesheets.map(([, href]) => fetch(new URL(href, baseUrl))),
+  );
+  return stylesheetResponses.every((stylesheet) => stylesheet.ok);
+}
+
+async function waitForServer(timeout = 90000) {
   const started = Date.now();
   while (Date.now() - started < timeout) {
     try {
-      const response = await fetch(url);
-      if (response.ok) return;
+      if (await isHealthyNuggetServer()) return;
     } catch {}
     await new Promise((resolve) => setTimeout(resolve, 750));
   }
-  throw new Error(`Nugget did not start at ${url}`);
+  throw new Error(`Nugget did not start correctly at ${baseUrl}`);
 }
 
 async function launchServer() {
   try {
-    const response = await fetch(baseUrl);
-    if (response.ok) return;
+    if (await isHealthyNuggetServer()) return;
   } catch {}
 
   server = spawn(
     process.execPath,
-    [path.join(root, "node_modules", "next", "dist", "bin", "next"), "dev", "-p", "3000"],
+    [path.join(root, "node_modules", "next", "dist", "bin", "next"), "dev", "-p", serverPort],
     {
       cwd: root,
       stdio: "pipe",
@@ -38,7 +53,7 @@ async function launchServer() {
   );
   server.stdout.on("data", (chunk) => process.stdout.write(chunk));
   server.stderr.on("data", (chunk) => process.stderr.write(chunk));
-  await waitForServer(baseUrl);
+  await waitForServer();
 }
 
 async function main() {
@@ -49,9 +64,25 @@ async function main() {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 1000 },
     acceptDownloads: true,
+    locale: "zh-CN",
   });
   const page = await context.newPage();
   page.setDefaultTimeout(30000);
+  await page.route("**/api/generate-assets", async (route) => {
+    const request = route.request().postDataJSON();
+    const samples = [
+      "/generation-samples/fashion/hero.png",
+      "/generation-samples/fashion/variations.png",
+      "/generation-samples/fashion/detail.png",
+    ];
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        provider: "mock",
+        assets: (request.prompts ?? []).map((_, index) => samples[index % samples.length]),
+      }),
+    });
+  });
 
   await page.goto(baseUrl, { waitUntil: "networkidle" });
   await page.screenshot({ path: path.join(output, "01-landing.png"), fullPage: true });
@@ -61,21 +92,26 @@ async function main() {
 
   await page.goto(`${baseUrl}/production?competition=real-leather-student-2026`, { waitUntil: "networkidle" });
   await page.screenshot({ path: path.join(output, "11-production-studio.png"), fullPage: true });
-  await page.getByRole("button", { name: "读取全部文件并分析" }).click();
-  await page.getByRole("heading", { name: "你到底能不能参加？" }).waitFor();
+  await page.getByTestId("analyze-competition-files").click();
+  await page.getByTestId("workflow-eligibility").waitFor();
   await page.screenshot({ path: path.join(output, "12-board-composer.png"), fullPage: true });
-  await page.getByRole("button", { name: "确认资格并继续" }).click();
-  await page.getByRole("button", { name: "确认成果矩阵与数量" }).click();
-  await page.getByRole("button", { name: /批准 Second Life/ }).click();
-  await page.getByRole("button", { name: "生成 3 张竞赛视觉" }).click();
-  await page.getByText(/演示AI样板|OpenAI真实生成/).waitFor({ timeout: 120000 });
+  await page.getByTestId("confirm-eligibility").click();
+  await page.getByTestId("workflow-deliverables").waitFor();
+  await page.getByTestId("confirm-deliverables").click();
+  await page.getByTestId("workflow-concept").waitFor();
+  await page.getByTestId("approve-concept").click();
+  await page.getByTestId("workflow-assets").waitFor();
+  await page.getByTestId("generate-assets").click();
+  await page.getByTestId("generated-assets").waitFor({ timeout: 120000 });
   await page.screenshot({ path: path.join(output, "13-generated-visuals.png"), fullPage: true });
-  await page.getByRole("button", { name: "批准视觉并排版" }).click();
+  await page.getByTestId("approve-assets").click();
+  await page.getByTestId("workflow-layout").waitFor();
   await page.screenshot({ path: path.join(output, "14-auto-layout.png"), fullPage: true });
-  await page.getByRole("button", { name: "批准排版与文字" }).click();
-  await page.getByRole("checkbox").check();
-  await page.getByRole("button", { name: "模拟提交到竞赛网站" }).click();
-  await page.getByRole("heading", { name: "模拟提交成功" }).waitFor();
+  await page.getByTestId("approve-layout").click();
+  await page.getByTestId("workflow-review").waitFor();
+  await page.getByTestId("workflow-review").getByRole("checkbox").check();
+  await page.getByTestId("submit-competition").click();
+  await page.getByTestId("workflow-review").getByRole("heading", { name: "模拟提交成功" }).waitFor();
   await page.screenshot({ path: path.join(output, "15-submission-receipt.png"), fullPage: true });
 
   await page.goto(`${baseUrl}/studio`, { waitUntil: "networkidle" });

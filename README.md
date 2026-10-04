@@ -1,5 +1,7 @@
 # Nugget
 
+English | [简体中文](README.zh-CN.md)
+
 **Find golden ideas inside messy briefs.**
 
 Nugget is a global design competition radar and local-first AI studio for students and independent designers. It helps designers discover worthwhile open calls, understand fee, prize, eligibility, and deadline information, then turn the brief into a structured proposal package.
@@ -100,7 +102,6 @@ npm run typecheck
 npm run build
 npm run test:e2e
 npm run demo:screenshots
-npm run demo:proof
 ```
 
 Screenshots are written to `artifacts/screenshots/`.

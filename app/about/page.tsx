@@ -13,23 +13,23 @@ import { SectionLabel } from "@/components/section-label";
 const facts = [
   {
     icon: HardDrive,
-    title: "Local-first by design",
-    copy: "Briefs and saved projects stay in your browser’s localStorage. Nothing is sent to a Nugget account because there is no account.",
+    title: "本地优先设计",
+    copy: "竞赛 Brief 和已保存的项目都存储在浏览器 localStorage 中。Nugget 目前无需账户，因此这些内容不会上传至 Nugget 账户。",
   },
   {
     icon: Bot,
-    title: "A complete mock brain",
-    copy: "The public demo works without setup and produces a rich, realistic proposal kit from the sample brief.",
+    title: "完整的模拟 AI 能力",
+    copy: "公开 Demo 无需额外配置即可使用，并能根据示例 Brief 生成完整且接近真实使用场景的提案方案包。",
   },
   {
     icon: KeyRound,
-    title: "Bring a provider later",
-    copy: "Self-hosted copies can switch to OpenAI or Anthropic through server-side environment variables.",
+    title: "按需接入 AI 模型",
+    copy: "自托管版本可以通过服务端环境变量切换至 OpenAI 或 Anthropic。",
   },
   {
     icon: CloudOff,
-    title: "No cloud sync yet",
-    copy: "Projects do not follow you between browsers or devices. Export Markdown or JSON to take the work with you.",
+    title: "暂不支持云端同步",
+    copy: "项目目前不会在不同浏览器或设备之间自动同步。你可以导出 Markdown 或 JSON，将项目内容保存并带走。",
   },
 ];
 
@@ -38,10 +38,10 @@ export default function AboutPage() {
     <div className="px-4 py-14 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-3xl text-center">
-          <SectionLabel>Settings & about</SectionLabel>
-          <h1 className="display mt-6 text-5xl font-semibold sm:text-7xl">Small, honest, and yours.</h1>
+          <SectionLabel>设置 & 关于</SectionLabel>
+          <h1 className="display mt-6 text-5xl font-semibold sm:text-7xl">简单、透明，属于你。</h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-ink/60">
-            Nugget v0 is a local-first product demo: enough intelligence to show the whole experience, without accounts, billing, or hidden infrastructure.
+            Nugget v0 是一个本地优先的产品 Demo：提供足够完整的智能体验，无需账户、付费系统或复杂的后台基础。
           </p>
         </div>
 
@@ -63,14 +63,14 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-[.85fr_1.15fr]">
             <div className="p-8 sm:p-10">
               <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-gold">
-                <Code2 className="h-3.5 w-3.5" /> Provider setup
+                <Code2 className="h-3.5 w-3.5" /> AI 服务设置
               </span>
-              <h2 className="display mt-6 text-4xl font-semibold">Choose how Nugget thinks.</h2>
+              <h2 className="display mt-6 text-[31px] font-semibold">选择 Nugget 的思考方式。</h2>
               <p className="mt-4 leading-7 text-white/60">
-                Mock mode is the default and needs no key. For a private local install, add one provider key to <code className="text-gold">.env.local</code> and restart the app.
+                默认使用模拟模式，无需 API Key。若在本地私有部署，可在 <code className="text-gold">.env.local</code> 中添加相应的 AI 模型服务密钥，然后重新启动应用。
               </p>
               <div className="mt-7 space-y-3">
-                {["Keys stay server-side", "Mock fallback stays available", "No secrets committed"].map((item) => (
+                {["密钥仅保留在服务端", "始终保留模拟模式作为备用", "敏感密钥不会提交至代码仓库"].map((item) => (
                   <p key={item} className="flex items-center gap-3 text-sm font-semibold text-white/70">
                     <Check className="h-4 w-4 text-gold" /> {item}
                   </p>
@@ -102,9 +102,9 @@ ANTHROPIC_API_KEY=your_key_here`}</code>
 
         <section className="mt-6 grid gap-5 md:grid-cols-3">
           {[
-            { icon: LockKeyhole, label: "Authentication", value: "Not included yet" },
-            { icon: Sparkles, label: "Billing", value: "Not included yet" },
-            { icon: CloudOff, label: "Cloud sync", value: "Not included yet" },
+            { icon: LockKeyhole, label: "账户认证", value: "暂未支持" },
+            { icon: Sparkles, label: "付费系统", value: "暂未支持" },
+            { icon: CloudOff, label: "云端同步", value: "暂未支持" },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-4 rounded-3xl border border-ink/10 bg-paper p-5 shadow-card">
               <span className="grid h-11 w-11 place-items-center rounded-2xl bg-cream"><item.icon className="h-5 w-5" /></span>
