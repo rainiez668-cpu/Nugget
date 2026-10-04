@@ -1,5 +1,7 @@
 # Nugget
 
+English | [简体中文](README.zh-CN.md)
+
 **Find golden ideas inside messy briefs.**
 
 Nugget is a global design competition discovery and AI-assisted proposal workflow for students and independent designers.
